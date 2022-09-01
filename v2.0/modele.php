@@ -96,29 +96,29 @@ function MdlRechercherSalle($nomSalle): void {
         requeteSQL(
             "
                 SELECT
-                    api_universite_salles.id AS id,
-                    api_universite_salles.nom AS nom,
-                    api_universite_groupes_salles.nom AS nomGroupe,
-                    api_universite_batiments.id AS idBatiment,
-                    api_universite_batiments.libelleLong AS nomBatiment,
-                    api_universite_groupes_batiments.id AS codeComposante,
-                    api_universite_groupes_batiments.titre AS titreComposante
+                    api_university_rooms.id AS id,
+                    api_university_rooms.nom AS nom,
+                    api_university_room_groups.nom AS nomGroupe,
+                    api_university_buildings.id AS idBatiment,
+                    api_university_buildings.libelleLong AS nomBatiment,
+                    api_university_building_groups.id AS codeComposante,
+                    api_university_building_groups.titre AS titreComposante
                 FROM
-                    api_universite_salles
+                    api_university_rooms
                         JOIN
-                    api_universite_groupes_salles
+                    api_university_room_groups
                         ON
-                            api_universite_groupes_salles.id = api_universite_salles.idGroupe
+                            api_university_room_groups.id = api_university_rooms.idGroupe
                         JOIN
-                    api_universite_batiments
+                    api_university_buildings
                         ON
-                            api_universite_batiments.id = api_universite_groupes_salles.idBatiment
+                            api_university_buildings.id = api_university_room_groups.idBatiment
                         JOIN
-                    api_universite_groupes_batiments
+                    api_university_building_groups
                         ON
-                            api_universite_groupes_batiments.id = api_universite_batiments.idGroupe
+                            api_university_building_groups.id = api_university_buildings.idGroupe
                 WHERE
-                    LOWER(api_universite_salles.nom)
+                    LOWER(api_university_rooms.nom)
                         LIKE
                     :nomSalle
                 ",
@@ -133,7 +133,7 @@ function MdlApiGetBatiments(): void {
     $prepare = getConnect()->prepare(
         "
         SELECT
-            api_universite_batiments.id AS id,
+            api_university_buildings.id AS id,
             legende,
             titre,
             couleurR,
@@ -143,11 +143,11 @@ function MdlApiGetBatiments(): void {
             libelleLong,
             idGroupe
         FROM
-            api_universite_groupes_batiments
+            api_university_building_groups
                 JOIN
-            api_universite_batiments
+            api_university_buildings
                 ON
-                    api_universite_groupes_batiments.id = api_universite_batiments.idGroupe;
+                    api_university_building_groups.id = api_university_buildings.idGroupe;
         "
     );
     $prepare->execute();
@@ -190,14 +190,14 @@ function MdlApiGetSalles($idBatiment): void {
     $prepare = getConnect()->prepare(
         "
         SELECT
-            api_universite_groupes_salles.nom AS nomGroupe,
-            idGroupe, api_universite_salles.nom AS nom
+            api_university_room_groups.nom AS nomGroupe,
+            idGroupe, api_university_rooms.nom AS nom
         FROM
-            api_universite_groupes_salles
+            api_university_room_groups
                 JOIN
-            api_universite_salles
+            api_university_rooms
                 ON
-                    api_universite_groupes_salles.id = api_universite_salles.idGroupe
+                    api_university_room_groups.id = api_university_rooms.idGroupe
         WHERE idBatiment=:idBatiment;
         "
     );
@@ -239,11 +239,11 @@ function MdlApiGetGeoJson($idBatiment): void {
             c1,
             c2
         FROM
-            api_universite_polygons
+            api_university_polygons
                 JOIN
-            api_universite_coordonnees
+            api_university_coordinates
                 ON
-                    api_universite_polygons.id = api_universite_coordonnees.idPolygon
+                    api_university_polygons.id = api_university_coordinates.idPolygon
         WHERE idBatiment=:idBatiment;
         "
     );
