@@ -24,7 +24,6 @@ class SqlRequest {
     private string $sqlScript;
 
     // Constructeur
-
     /**
      * See SqlRequest::new for documentation
      */
