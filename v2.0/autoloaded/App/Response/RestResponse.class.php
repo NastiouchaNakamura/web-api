@@ -10,7 +10,7 @@ class RestResponse {
         $meta["start"] = $_SERVER["REQUEST_TIME_FLOAT"];
         $meta["end"] = microtime(true);
         $meta["version"] = file_get_contents(ROOT . "version.txt");
-        $meta["author"] = "Anaël BARODINE, étudiant en informatique à l\'Université d\'Orléans, au nom de l\'association étudiante Tribu-Terre.";
+        $meta["author"] = "Anaël BARODINE, CS student at University of Orléans, as member of Tribu-Terre";
 
         $objects = array();
         foreach ($instances as $instance) {
