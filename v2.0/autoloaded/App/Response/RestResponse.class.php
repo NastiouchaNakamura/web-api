@@ -14,7 +14,11 @@ class RestResponse {
 
         $objects = array();
         foreach ($instances as $instance) {
-            $objects[] = RestResponse::toObject($instance);
+            if (is_object($instance)) {
+                $objects[] = RestResponse::toObject($instance);
+            } else {
+                $objects[] = $instance;
+            }
         }
 
         return json_encode(
