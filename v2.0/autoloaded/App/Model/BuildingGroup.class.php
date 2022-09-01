@@ -5,7 +5,29 @@ use App\Request\SqlRequest;
 
 class BuildingGroup {
     // Fetcheur statique
-    public static function fetch($id): array {
+    public static function fetchAllId(): array {
+        $responses = SqlRequest::new(<<< EOF
+SELECT
+    id
+FROM
+    api_university_building_groups;
+EOF
+        )->execute();
+
+        $buildingGroupIds = array();
+
+        foreach ($responses as $response) {
+            $buildingGroupIds[] = $response->id;
+        }
+
+        return $buildingGroupIds;
+    }
+
+    public static function fetchById(array $ids): array {
+        if (count($ids) == 0) return array();
+
+        $unpreparedArray = "(?" . str_repeat(",?", count($ids) - 1) . ")";
+
         $responses = SqlRequest::new(<<< EOF
 SELECT
     id,
@@ -16,10 +38,12 @@ SELECT
     color_b
 FROM
     api_university_building_groups
-WHERE id=?;
+WHERE id IN $unpreparedArray;
 EOF
-        )->execute([$id]);
+        )->execute($ids);
 
+        $count = 0;
+        $buildingGroupIdToCount = array();
         $buildingGroups = array();
 
         foreach ($responses as $response) {
@@ -29,22 +53,25 @@ EOF
             $buildingGroup->legend = $response->legend;
             $buildingGroup->name = $response->name;
             $buildingGroup->color = [$response->color_r, $response->color_g, $response->color_b];
-
-            $response = SqlRequest::new(<<< EOF
-SELECT
-    id
-FROM
-    api_university_buildings
-WHERE idBuildingGroups=?;
-EOF
-            )->execute([$response->id]);
-
             $buildingGroup->buildings = array();
-            foreach ($response as $building) {
-                $buildingGroup->buildings[] = $building->id;
-            }
+
+            $buildingGroupIdToCount[$buildingGroup->id] = $count++;
 
             $buildingGroups[] = $buildingGroup;
+        }
+
+        $responses = SqlRequest::new(<<< EOF
+SELECT
+    id,
+    idBuildingGroups
+FROM
+    api_university_buildings
+WHERE idBuildingGroups IN $unpreparedArray;
+EOF
+        )->execute($ids);
+
+        foreach ($responses as $response) {
+            $buildingGroups[$buildingGroupIdToCount[$response->idBuildingGroups]]->buildings[] = $response->id;
         }
 
         return $buildingGroups;
