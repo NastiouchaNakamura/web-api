@@ -3,9 +3,18 @@ namespace App\Request;
 
 use Exception;
 use PDO;
+use PDOException;
 
 class SqlRequest {
     // Constructeur statique
+    /**
+     * Create new SqlRequest instance
+     * Environment variables "SECRET_SQL_SERVER", "SECRET_SQL_DB", "SECRET_SQL_USER" and "SECRET_SQL_PASSWORD" have to
+     * be set before call
+     * @param string $sqlScript SQL script to be executed
+     * @return SqlRequest the SqlRequest instance ready for use
+     * @throws PDOException
+     */
     public static function new(string $sqlScript): SqlRequest {
         return new SqlRequest($sqlScript);
     }
@@ -15,22 +24,32 @@ class SqlRequest {
     private string $sqlScript;
 
     // Constructeur
-    public function __construct(string $sqlScript) {
-        try {
-            $this->pdo = new PDO(
-                "mysql:host=" . getenv("SECRET_SQL_SERVER") . ';dbname=' . getenv("SECRET_SQL_DB"),
-                getenv("SECRET_SQL_USER"),
-                getenv("SECRET_SQL_PASSWORD")
-            );
-            $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            $this->pdo->query('SET NAMES UTF8MB4'); // UTF8mb4 : Pour pouvoir encoder des émojis
-        } catch (Exception $exception) {
-            echo $exception->getMessage();
-        }
+
+    /**
+     * See SqlRequest::new for documentation
+     */
+    private function __construct(string $sqlScript) {
+        $this->pdo = new PDO(
+            "mysql:host=" . getenv("SECRET_SQL_SERVER") . ';dbname=' . getenv("SECRET_SQL_DB"),
+            getenv("SECRET_SQL_USER"),
+            getenv("SECRET_SQL_PASSWORD")
+        );
+        $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $this->pdo->query('SET NAMES UTF8MB4'); // UTF8mb4 : Pour pouvoir encoder des émojis
         $this->sqlScript = $sqlScript;
     }
 
     // Méthodes
+
+    /**
+     * Executes the SQL script given on construct into the database
+     * @param array $variables array of variables: each "?" in the SQL script will be replaced by the values of the
+     * array, respecting array sorting
+     * @param int $max maximum returned items; 0 for no maximum, which is default
+     * @return array array of returned items of type object, with attributes corresponding to SQL request and additional
+     * "count" to count the items
+     * @throws PDOException
+     */
     public function execute(array $variables = array(), int $max = 0): array {
         $prepare = $this->pdo->prepare($this->sqlScript . ($max != 0 ? " LIMIT $max" : ""));
 
@@ -51,9 +70,6 @@ class SqlRequest {
                 $item["count"] = $index;
                 $results[] = (object) $item;
             }
-        } catch (Exception $exception) {
-            echo $exception->getMessage();
-            $results = array();
         } finally {
             $prepare->closeCursor();
         }
