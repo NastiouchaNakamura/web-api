@@ -4,22 +4,22 @@ namespace App\Model;
 
 class Error {
     // Constructeur statique
-    public static function new(string|int $code, string $message): Error {
+    public static function new(string|int|null $code, string $message): Error {
         return new Error($code, $message);
     }
 
     // Attributs
-    private string|int $code;
+    private string|int|null $code;
     private string $message;
 
     // Constructeur
-    private function __construct(string|int $code, string $message) {
+    private function __construct(string|int|null $code, string $message) {
         $this->code = $code;
         $this->message = $message;
     }
 
     // Getteurs
-    public function getCode(): int|string {
+    public function getCode(): int|string|null {
         return $this->code;
     }
 
