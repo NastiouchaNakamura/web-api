@@ -14,7 +14,8 @@ class Building {
 SELECT
     id,
     short_label,
-    long_label
+    long_label,
+    id_building_group
 FROM
     api_university_buildings
 WHERE id IN $unpreparedArray;
@@ -28,12 +29,14 @@ EOF
         foreach ($responses as $response) {
             $building = new Building();
 
-            $building->id = $response->id;
+            $building->buildingId = $response->id;
+            $building->buildingGroupId = $response->id_building_group;
             $building->shortLabel = $response->short_label;
             $building->longLabel = $response->long_label;
             $building->roomGroups = array();
+            $building->geoJson = null;
 
-            $buildingIdToCount[$building->id] = $count++;
+            $buildingIdToCount[$building->buildingId] = $count++;
 
             $buildings[] = $building;
         }
@@ -60,27 +63,35 @@ EOF
     private function __construct() {}
 
     // Attributs
-    private string $id;
+    private int $buildingId;
+    private string $buildingGroupId;
     private string $shortLabel;
     private string $longLabel;
     private array $roomGroups;
-    private array $geoJson;
+    private array|null $geoJson;
 
     // Getteurs
-    public function getId(): string {
-        return $this->id;
+    public function getBuildingId(): int {
+        return $this->buildingId;
+    }
+
+    public function getBuildingGroupId(): string {
+        return $this->buildingGroupId;
     }
 
     public function getShortLabel(): string {
         return $this->shortLabel;
     }
 
-    public function getLongLabel(): string
-    {
+    public function getLongLabel(): string {
         return $this->longLabel;
     }
 
     public function getRoomGroups(): array {
         return $this->roomGroups;
+    }
+
+    public function getGeoJson(): array|null {
+        return $this->geoJson;
     }
 }

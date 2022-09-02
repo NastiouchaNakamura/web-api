@@ -49,13 +49,13 @@ EOF
         foreach ($responses as $response) {
             $buildingGroup = new BuildingGroup();
 
-            $buildingGroup->id = $response->id;
+            $buildingGroup->buildingGroupId = $response->id;
             $buildingGroup->legend = $response->legend;
             $buildingGroup->name = $response->name;
             $buildingGroup->color = [$response->color_r, $response->color_g, $response->color_b];
             $buildingGroup->buildings = array();
 
-            $buildingGroupIdToCount[$buildingGroup->id] = $count++;
+            $buildingGroupIdToCount[$buildingGroup->buildingGroupId] = $count++;
 
             $buildingGroups[] = $buildingGroup;
         }
@@ -71,7 +71,7 @@ EOF
         )->execute($ids);
 
         foreach ($responses as $response) {
-            $buildingGroups[$buildingGroupIdToCount[$response->id_building_groups]]->buildings[] = $response->id;
+            $buildingGroups[$buildingGroupIdToCount[$response->id_building_group]]->buildings[] = $response->id;
         }
 
         return $buildingGroups;
@@ -81,15 +81,15 @@ EOF
     private function __construct() {}
 
     // Attributs
-    private string $id;
+    private string $buildingGroupId;
     private string $legend;
     private string $name;
     private array $color;
     private array $buildings;
 
     // Getteurs
-    public function getId(): string {
-        return $this->id;
+    public function getBuildingGroupId(): string {
+        return $this->buildingGroupId;
     }
 
     public function getLegend(): string {
