@@ -63,15 +63,15 @@ EOF
         $responses = SqlRequest::new(<<< EOF
 SELECT
     id,
-    idBuildingGroups
+    id_building_group
 FROM
     api_university_buildings
-WHERE idBuildingGroups IN $unpreparedArray;
+WHERE id_building_group IN $unpreparedArray;
 EOF
         )->execute($ids);
 
         foreach ($responses as $response) {
-            $buildingGroups[$buildingGroupIdToCount[$response->idBuildingGroups]]->buildings[] = $response->id;
+            $buildingGroups[$buildingGroupIdToCount[$response->id_building_groups]]->buildings[] = $response->id;
         }
 
         return $buildingGroups;
