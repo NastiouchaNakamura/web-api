@@ -5,7 +5,7 @@ use App\Request\SqlRequest;
 
 class Building {
     // Fetcheur statique
-    public static function fetchById(array $ids): array {
+    public static function fetchById(array $ids, bool $geoJson): array {
         // S'il n'y a aucun ID dans l'array, on ne revoit aucun résultat donc un array vide.
         if (count($ids) == 0) return array();
 
@@ -63,6 +63,84 @@ EOF
         foreach ($responses as $response) {
             // Stockage du groupe de salle dans l'attribut groupes de salles du bâtiment selon l'ID du bâtiment.
             $buildings[$response->id_building]->roomGroups[] = $response->id;
+        }
+
+        // Si on veut le GeoJSON...
+        if ($geoJson) {
+            // Requête des polygones
+            $responses = SqlRequest::new(<<< EOF
+SELECT
+    id,
+    carved,
+    polygon_no,
+    id_building
+FROM
+    api_university_polygons
+WHERE
+    id_building IN $unpreparedArray
+EOF
+            )->execute($ids);
+
+            $polygonsOfBuildings = array();
+            $polygonIdToBuilding = array();
+
+            foreach ($responses as $response) {
+                if (!key_exists($response->id_building, $polygonsOfBuildings)) {
+                    $polygonsOfBuildings[$response->id_building] = array();
+                }
+
+                if (!key_exists($response->polygon_no, $polygonsOfBuildings[$response->id_building])) {
+                    $polygonsOfBuildings[$response->id_building][$response->polygon_no] = array();
+                }
+
+                if ($response->carved == 0) {
+                    array_unshift(
+                        $polygonsOfBuildings[$response->id_building][$response->polygon_no],
+                        $response->id
+                    );
+                } else {
+                    $polygonsOfBuildings[$response->id_building][$response->polygon_no][] = $response->id;
+                }
+
+                $polygonIdToBuilding[$response->id] = $response->id_building;
+            }
+
+            // Requête des coordonnées
+            $unpreparedArrayCoordinates = "(?" . str_repeat(",?", count($polygonIdToBuilding) - 1) . ")";
+
+            $responses = SqlRequest::new(<<< EOF
+SELECT
+    id,
+    id_polygon,
+    c1,
+    c2,
+    seq_no
+FROM
+    api_university_coordinates
+WHERE
+    id_polygon IN $unpreparedArrayCoordinates
+ORDER BY id_polygon, seq_no
+EOF
+            )->execute(array_keys($polygonIdToBuilding));
+
+            $polygonsOfId = array();
+            foreach ($responses as $response) {
+                if (!key_exists($response->id_polygon, $polygonsOfId)) {
+                    $polygonsOfId[$response->id_polygon] = array();
+                }
+
+                $polygonsOfId[$response->id_polygon][] = [$response->c1, $response->c1];
+            }
+
+            foreach ($polygonsOfBuildings as $multiPolygons) {
+                foreach ($multiPolygons as $multiPolygon) {
+                    for ($i = 0; $i < count($multiPolygon); $i++) {
+                        $multiPolygon[$i] = $polygonsOfId[$i];
+                    }
+                }
+            }
+
+            print_r($polygonsOfBuildings);
         }
 
         // Retour du tableau de retour de méthode.
