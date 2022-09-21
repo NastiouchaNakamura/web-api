@@ -49,7 +49,7 @@ EOF
             $buildingIds[] = $roomGroup->buildingId;
         }
 
-        // Requête des salles d'ID de groupes de salle fourni.
+        // Requête des salles d'ID de groupes de salle fournis.
         $responses = SqlRequest::new(<<< EOF
 SELECT
     id,
