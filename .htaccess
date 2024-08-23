@@ -1,0 +1,6 @@
+#ErrorDocument 400 /errordocument.html
+#ErrorDocument 401 /errordocument.html
+# Hide 403 errors as 404
+ErrorDocument 403 /404_error.php
+ErrorDocument 404 /404_error.php
+#ErrorDocument 500 /errordocument.html

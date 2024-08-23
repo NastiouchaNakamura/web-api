@@ -1,5 +1,5 @@
 <?php
-namespace App\Model;
+namespace App\Model\University;
 
 use App\Request\SqlRequest;
 

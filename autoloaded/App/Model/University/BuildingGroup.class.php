@@ -1,10 +1,18 @@
 <?php
-namespace App\Model;
+namespace App\Model\University;
 
+use App\Model\Color;
 use App\Request\SqlRequest;
 
 class BuildingGroup {
-    // Fetcheur statique
+    // Properties
+    public string $buildingGroupId;
+    public string $legend;
+    public string $name;
+    public Color $color;
+    public array $buildings;
+
+    // Static constructors
     public static function fetchAllId(): array {
         $responses = SqlRequest::new(<<< EOF
 SELECT
@@ -57,7 +65,7 @@ EOF
             $buildingGroup->buildingGroupId = $response->id;
             $buildingGroup->legend = $response->legend;
             $buildingGroup->name = $response->name;
-            $buildingGroup->color = [$response->color_r, $response->color_g, $response->color_b];
+            $buildingGroup->color = new Color($response->color_r, $response->color_g, $response->color_b);
 
             // Initialisation des attributs à aller chercher.
             $buildingGroup->buildings = array();
@@ -84,40 +92,7 @@ EOF
         }
 
         // Retour du tableau de retour de méthode.
+
         return $buildingGroups;
-    }
-
-    // Constructeurs
-    private function __construct() {}
-
-    // Attributs
-    private string $buildingGroupId;
-    private string $legend;
-    private string $name;
-    private array $color;
-    private array $buildings;
-
-    // Getteurs
-    public function getBuildingGroupId(): string {
-        return $this->buildingGroupId;
-    }
-
-    public function getLegend(): string {
-        return $this->legend;
-    }
-
-    public function getName(): string {
-        return $this->name;
-    }
-
-    public function getColor(): array {
-        return [
-            "rgb" => $this->color,
-            "hex" => sprintf("#%02x%02x%02x", $this->color[0], $this->color[1], $this->color[2])
-        ];
-    }
-
-    public function getBuildings(): array {
-        return $this->buildings;
     }
 }

@@ -1,9 +1,9 @@
 <?php
 require $_SERVER["DOCUMENT_ROOT"] . "/controller.php";
 
-use App\Model\Building;
 use App\Model\Error;
 use App\Model\InternalError;
+use App\Model\University\Building;
 use App\Response\RestResponse;
 
 try {

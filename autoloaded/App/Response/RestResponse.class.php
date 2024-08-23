@@ -1,8 +1,11 @@
 <?php
 namespace App\Response;
 
+use App\Model\GeoJson\GeoJsonGeometry;
+use Closure;
+
 class RestResponse {
-    public static function get(int $httpCode, array $instances): string {
+    public static function get(int $httpCode, array $data): string {
 
         // TODO : Limiter les accès à certains domaines.
         // Allow from any origin
@@ -31,32 +34,47 @@ class RestResponse {
         $meta["version"] = VERSION;
         $meta["author"] = "Anaël BARODINE";
 
-        $objects = array();
-        foreach ($instances as $instance) {
-            $objects[] = RestResponse::decomposeObject($instance);
-        }
-
         return json_encode(
             array(
                 "metadata" => $meta,
-                "data" => [
-                    "object_count" => count($objects),
-                    "objects" => $objects
-                ]
+                "data" => RestResponse::decomposeObject($data)
             )
         );
     }
 
-    public static function decomposeObject($instance): array | bool | int | float | string {
-        if (is_bool($instance) || is_int($instance) || is_float($instance) || is_string($instance)) {
+    public static function decomposeObject($instance): array | bool | int | float | string | null {
+        if (is_bool($instance) || is_int($instance) || is_float($instance) || is_string($instance) || is_null($instance)) {
             return $instance;
+
+        } elseif (is_array($instance)) {
+            $object = [
+                "type" => "array"
+            ];
+
+            $array = array();
+            foreach ($instance as $element) {
+                $array[] = RestResponse::decomposeObject($element);
+            }
+
+            $object["size"] = count($array);
+            $object["data"] = $array;
+
+            return $object;
+
+        } elseif ($instance instanceof GeoJsonGeometry) {
+            return $instance->toGeoJson();
+
         } else {
             $className = explode("\\", get_class($instance));
             $className = strtolower(preg_replace('/(?<!^)[A-Z]/', '_$0', end($className)));
 
-            $object = [
-                "type" => $className
-            ];
+            $object = ["type" => $className];
+
+            foreach (array_keys(get_class_vars(get_class($instance))) as $classProperty) {
+                $attributeName = strtolower(preg_replace("/(?<!^)[A-Z]/", "_$0", $classProperty));
+                $attribute = $instance->$classProperty;
+                $object[$attributeName] = RestResponse::decomposeObject($attribute);
+            }
 
             foreach (get_class_methods($instance) as $classMethod) {
                 if (str_starts_with($classMethod, "get")) {
@@ -65,6 +83,8 @@ class RestResponse {
                     $object[$attributeName] = RestResponse::decomposeObject($attribute);
                 }
             }
+
+            ksort($object);
 
             return $object;
         }

@@ -28,12 +28,14 @@ class SqlRequest {
      */
     private function __construct(string $sqlScript) {
         $this->pdo = new PDO(
-            "mysql:host=" . getenv("SECRET_SQL_SERVER") . ';dbname=' . getenv("SECRET_SQL_DB"),
-            getenv("SECRET_SQL_USER"),
-            getenv("SECRET_SQL_PASSWORD")
+            "mysql:host=" . SECRET_SQL_SERVER
+            . ';port=' . SECRET_SQL_PORT
+            . ';dbname=' . SECRET_SQL_DB,
+            SECRET_SQL_USER,
+            SECRET_SQL_PASSWORD
         );
         $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        $this->pdo->query('SET NAMES UTF8MB4'); // UTF8mb4 : Pour pouvoir encoder des émojis
+        $this->pdo->query('SET NAMES UTF8MB4');// UTF8mb4 : Pour pouvoir encoder des émojis
         $this->sqlScript = $sqlScript;
     }
 
