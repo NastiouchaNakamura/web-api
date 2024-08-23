@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Response;
 
 class RestResponse {
@@ -26,19 +25,15 @@ class RestResponse {
 
         header("Content-Type: application/json; charset=UTF-8");
         http_response_code($httpCode);
-        $meta["source_url"] = "https://{$_SERVER["HTTP_HOST"]}{$_SERVER["REQUEST_URI"]}";
+        $meta["source_url"] = (empty($_SERVER["HTTPS"]) ? "http" : "https") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
         $meta["start"] = $_SERVER["REQUEST_TIME_FLOAT"];
         $meta["end"] = microtime(true);
-        $meta["version"] = file_get_contents(ROOT . "version.txt");
-        $meta["author"] = "Anaël BARODINE, CS student at University of Orléans, as member of Tribu-Terre";
+        $meta["version"] = VERSION;
+        $meta["author"] = "Anaël BARODINE";
 
         $objects = array();
         foreach ($instances as $instance) {
-            if (is_object($instance)) {
-                $objects[] = RestResponse::toObject($instance);
-            } else {
-                $objects[] = $instance;
-            }
+            $objects[] = RestResponse::decomposeObject($instance);
         }
 
         return json_encode(
@@ -52,22 +47,26 @@ class RestResponse {
         );
     }
 
-    public static function toObject($instance): array {
-        $className = explode("\\", get_class($instance));
-        $className = strtolower(preg_replace('/(?<!^)[A-Z]/', '_$0', end($className)));
+    public static function decomposeObject($instance): array | bool | int | float | string {
+        if (is_bool($instance) || is_int($instance) || is_float($instance) || is_string($instance)) {
+            return $instance;
+        } else {
+            $className = explode("\\", get_class($instance));
+            $className = strtolower(preg_replace('/(?<!^)[A-Z]/', '_$0', end($className)));
 
-        $object = [
-            "type" => $className
-        ];
+            $object = [
+                "type" => $className
+            ];
 
-        foreach (get_class_methods($instance) as $classMethod) {
-            if (str_starts_with($classMethod, "get")) {
-                $attributeName = strtolower(preg_replace("/(?<!^)[A-Z]/", "_$0", substr($classMethod, 3)));
-                $attribute = $instance->$classMethod();
-                $object[$attributeName] = $attribute;
+            foreach (get_class_methods($instance) as $classMethod) {
+                if (str_starts_with($classMethod, "get")) {
+                    $attributeName = strtolower(preg_replace("/(?<!^)[A-Z]/", "_$0", substr($classMethod, 3)));
+                    $attribute = $instance->$classMethod();
+                    $object[$attributeName] = RestResponse::decomposeObject($attribute);
+                }
             }
-        }
 
-        return $object;
+            return $object;
+        }
     }
 }

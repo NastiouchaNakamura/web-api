@@ -1,7 +1,6 @@
 <?php
 namespace App\Request;
 
-use Exception;
 use PDO;
 use PDOException;
 
