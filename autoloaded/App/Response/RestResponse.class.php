@@ -2,7 +2,6 @@
 namespace App\Response;
 
 use App\Model\GeoJson\GeoJsonGeometry;
-use Closure;
 
 class RestResponse {
     public static function get(int $httpCode, array $data): string {

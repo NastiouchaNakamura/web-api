@@ -19,7 +19,7 @@ Description of endpoint
 |------|------|-------------|
 |      |      |             |
 
-#### Response schema
+#### Response example
 ```json
 {
   
