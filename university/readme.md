@@ -203,14 +203,15 @@ No exception.
 }
 ```
 
-### Room groups
+### Rooms
 
-Fetches the requested room.
+Fetches the requested rooms.
 
 #### Parameters
-| Name | Type   | Description                                                                                                |
-|------|--------|------------------------------------------------------------------------------------------------------------|
-| `id` | string | ID of the room to fetch. Multiple IDs can be requested at once using the comma character `,` as separator. |
+| Name   | Type   | Description                                                                                                     |
+|--------|--------|-----------------------------------------------------------------------------------------------------------------|
+| `id`   | string | ID of the room to fetch. Multiple IDs can be requested at once using the comma character `,` as separator.      |
+| `name` | string | Name or part of the name of the room(s) to fetch. For instance, `name=BS` would return rooms "BS02" and "BS07". |
 
 #### Exceptions
 
