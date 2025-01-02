@@ -2,6 +2,7 @@
 namespace App\Response;
 
 use App\Model\GeoJson\GeoJsonGeometry;
+use DateTime;
 
 class RestResponse {
     public static function get(int $httpCode, array $data): string {
@@ -44,6 +45,9 @@ class RestResponse {
     public static function decomposeObject($instance): array | bool | int | float | string | null {
         if (is_bool($instance) || is_int($instance) || is_float($instance) || is_string($instance) || is_null($instance)) {
             return $instance;
+
+        } elseif ($instance instanceof DateTime) {
+            return $instance->format("Y-m-d H:i:s");
 
         } elseif (is_array($instance)) {
             $object = [
