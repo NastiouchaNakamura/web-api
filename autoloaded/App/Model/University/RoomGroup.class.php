@@ -4,6 +4,13 @@ namespace App\Model\University;
 use App\Request\SqlRequest;
 
 class RoomGroup {
+    // Attributs
+    public int $roomGroupId;
+    public int $buildingId;
+    public string|null $buildingGroupId;
+    public string $name;
+    public array $rooms;
+
     // Fetcheur statique
     public static function fetchById(array $ids): array {
         // S'il n'y a aucun ID dans l'array, on ne revoit aucun résultat donc un array vide.
@@ -98,36 +105,5 @@ EOF
 
         // Retour du tableau de retour de méthode.
         return $roomGroups;
-    }
-
-    // Constructeurs
-    private function __construct() {}
-
-    // Attributs
-    private int $roomGroupId;
-    private int $buildingId;
-    private string|null $buildingGroupId;
-    private string $name;
-    private array $rooms;
-
-    // Getteurs
-    public function getRoomGroupId(): int {
-        return $this->roomGroupId;
-    }
-
-    public function getBuildingId(): int {
-        return $this->buildingId;
-    }
-
-    public function getBuildingGroupId(): string|null {
-        return $this->buildingGroupId;
-    }
-
-    public function getName(): string {
-        return $this->name;
-    }
-
-    public function getRooms(): array {
-        return $this->rooms;
     }
 }

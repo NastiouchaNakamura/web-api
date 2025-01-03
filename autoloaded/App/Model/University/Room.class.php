@@ -4,6 +4,13 @@ namespace App\Model\University;
 use App\Request\SqlRequest;
 
 class Room {
+    // Attributs
+    public int $roomId;
+    public int $roomGroupId;
+    public int|null $buildingId;
+    public string|null $buildingGroupId;
+    public string $name;
+
     // Fetcheurs statique
     public static function fetchByName(string $name): array {
         // Nettoyage de la chaîne.
@@ -147,36 +154,5 @@ EOF
 
         // Retour du tableau de retour de méthode.
         return $rooms;
-    }
-
-    // Constructeurs
-    private function __construct() {}
-
-    // Attributs
-    private int $roomId;
-    private int $roomGroupId;
-    private int|null $buildingId;
-    private string|null $buildingGroupId;
-    private string $name;
-
-    // Getteurs
-    public function getRoomId(): int {
-        return $this->roomId;
-    }
-
-    public function getRoomGroupId(): int {
-        return $this->roomGroupId;
-    }
-
-    public function getBuildingId(): int|null {
-        return $this->buildingId;
-    }
-
-    public function getBuildingGroupId(): string|null {
-        return $this->buildingGroupId;
-    }
-
-    public function getName(): string {
-        return $this->name;
     }
 }

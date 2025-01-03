@@ -6,7 +6,7 @@ class Color {
     public int $g;
     public int $b;
 
-    public function __construct(int $r = null, int $g = null, int $b = null) {
+    public function __construct(int $r, int $g, int $b) {
         $this->r = $r;
         $this->g = $g;
         $this->b = $b;
