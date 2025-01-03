@@ -12,6 +12,7 @@ class Question {
     public int $difficulty;
     public string $statement;
     public array $answers;
+    public string $explanation;
     public string|null $source;
     public DateTime $lastUpdated;
 
@@ -22,17 +23,19 @@ class Question {
         $unpreparedArray = "(?" . str_repeat(",?", count($ids) - 1) . ")";
         $responses = SqlRequest::new(<<< EOF
 SELECT
-    id,
+    api_quiz_questions.id AS id,
     id_category,
     label AS label_category,
     difficulty,
     statement,
     answers,
+    explanation,
     source,
     last_updated
 FROM
-    api_quiz_questions NATURAL JOIN api_quiz_categories
-WHERE id IN $unpreparedArray;
+    api_quiz_questions JOIN api_quiz_categories ON api_quiz_categories.id = api_quiz_questions.id_category
+WHERE
+    api_quiz_questions.id IN $unpreparedArray;
 EOF
         )->execute($ids);
 
@@ -44,6 +47,7 @@ EOF
             $question->difficulty = $response->difficulty;
             $question->statement = $response->statement;
             $question->answers = explode("||", $response->answers);
+            $question->explanation = $response->explanation;
             $question->source = $response->source;
             $question->lastUpdated = new DateTime($response->last_updated);
 
