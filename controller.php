@@ -10,7 +10,11 @@
 ########################################################################################################################
 # Chargement des variables d'environnement                                                                             #
 ########################################################################################################################
-require $_SERVER['DOCUMENT_ROOT'] . "/../secrets.php";
+if (file_exists($_SERVER['DOCUMENT_ROOT'] . "/../secrets.php")) {
+    require $_SERVER['DOCUMENT_ROOT'] . "/../secrets.php";
+} elseif (file_exists($_SERVER['DOCUMENT_ROOT'] . "/secrets.php")) {
+    require $_SERVER['DOCUMENT_ROOT'] . "/secrets.php";
+}
 
 ########################################################################################################################
 # Chargement de la version                                                                                             #

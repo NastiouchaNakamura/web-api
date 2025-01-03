@@ -12,6 +12,7 @@ class Question {
     public int $difficulty;
     public string $statement;
     public array $answers;
+    public string|null $source;
     public DateTime $lastUpdated;
 
     // Static constructors
@@ -27,6 +28,7 @@ SELECT
     difficulty,
     statement,
     answers,
+    source,
     last_updated
 FROM
     api_quiz_questions NATURAL JOIN api_quiz_categories
@@ -42,6 +44,7 @@ EOF
             $question->difficulty = $response->difficulty;
             $question->statement = $response->statement;
             $question->answers = explode("||", $response->answers);
+            $question->source = $response->source;
             $question->lastUpdated = new DateTime($response->last_updated);
 
             $question->category = new Category();
