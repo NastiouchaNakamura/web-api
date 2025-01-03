@@ -49,9 +49,9 @@ class RestResponse {
 
         // Types construits à format spécial.
         elseif ($instance instanceof DateTime)
-            return ["type" => "dateTime", "value" => $instance->format("Y-m-d H:i:s")];
+            return ["type" => "date_time", "value" => $instance->format("Y-m-d H:i:s")];
         elseif ($instance instanceof GeoJsonGeometry)
-            return ["type" => "geoJson", "value" => $instance->toGeoJson()];
+            return ["type" => "geo_json", "value" => $instance->toGeoJson()];
 
         // Tableaux.
         elseif (is_array($instance))
@@ -96,8 +96,6 @@ class RestResponse {
                 $object[$attributeName] = RestResponse::encapsulateValue($attribute);
             }
         }
-
-        ksort($object);
 
         return $object;
     }
