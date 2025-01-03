@@ -36,7 +36,7 @@ class SqlRequest {
         );
         $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         $this->pdo->query('SET NAMES UTF8MB4');// UTF8mb4 : Pour pouvoir encoder des émojis
-        $this->sqlScript = $sqlScript;
+        $this->sqlScript = trim(preg_replace("/\s+/", " ", $sqlScript));
     }
 
     // Méthodes
