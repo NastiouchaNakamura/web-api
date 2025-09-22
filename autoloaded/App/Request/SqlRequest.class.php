@@ -8,11 +8,11 @@ class SqlRequest {
     // Constructeur statique
     /**
      * Create new SqlRequest instance
-     * Environment variables "SECRET_SQL_SERVER", "SECRET_SQL_DB", "SECRET_SQL_USER" and "SECRET_SQL_PASSWORD" have to
-     * be set before call
+     * Environment variables "SQL_HOST", "SQL_PORT", "SQL_DATABASE", "SQL_USER" and "SQL_PASSWORD" have to be set before
+     * call
      * @param string $sqlScript SQL script to be executed
      * @return SqlRequest the SqlRequest instance ready for use
-     * @throws PDOException
+     * @throws PDOException when an exception occurs on initial connection
      */
     public static function new(string $sqlScript): SqlRequest {
         return new SqlRequest($sqlScript);
@@ -28,11 +28,11 @@ class SqlRequest {
      */
     private function __construct(string $sqlScript) {
         $this->pdo = new PDO(
-            "mysql:host=" . SECRET_SQL_SERVER
-            . ';port=' . SECRET_SQL_PORT
-            . ';dbname=' . SECRET_SQL_DB,
-            SECRET_SQL_USER,
-            SECRET_SQL_PASSWORD
+            "mysql:host=" . getenv("SQL_HOST")
+            . ';port=' . getenv("SQL_PORT")
+            . ';dbname=' . getenv("SQL_DATABASE"),
+            getenv("SQL_USER"),
+            getenv("SQL_PASSWORD")
         );
         $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         $this->pdo->query('SET NAMES UTF8MB4');// UTF8mb4 : Pour pouvoir encoder des émojis
@@ -42,12 +42,13 @@ class SqlRequest {
     // Méthodes
 
     /**
-     * Executes the SQL script given on construct into the database
+     * Executes the SQL script (given on construct) into the database
      * @param array $variables array of variables: each "?" in the SQL script will be replaced by the values of the
-     * array, respecting array sorting
-     * @param int $max maximum returned items; 0 for no maximum, which is default
-     * @return array array of returned items of type object, with attributes corresponding to SQL request and additional
-     * "count" to count the items
+     * array, in the same order
+     * @param int $max maximum returned items; defaults to 0 for no maximum
+     * @return array array of returned items, each one typed as an object which attributes corresponds to the columns of
+     * the SQL response, and an additional attribute "count" on each object that is the index of the object in the
+     * response (starting at 0)
      * @throws PDOException
      */
     public function execute(array $variables = array(), int $max = 0): array {
