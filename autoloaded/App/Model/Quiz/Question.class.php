@@ -8,7 +8,7 @@ use DateTime;
 class Question {
     // Attributes
     public int $id;
-    public Category $category;
+    public Theme $category;
     public int $difficulty;
     public string $statement;
     public array $answers;
@@ -33,7 +33,7 @@ SELECT
     source,
     last_updated
 FROM
-    api_quiz_questions JOIN api_quiz_categories ON api_quiz_categories.id = api_quiz_questions.id_category
+    api_quiz_questions_multi JOIN api_quiz_themes ON api_quiz_categories.id = api_quiz_questions.id_category
 WHERE
     api_quiz_questions.id IN $unpreparedArray;
 EOF
@@ -51,7 +51,7 @@ EOF
             $question->source = $response->source;
             $question->lastUpdated = new DateTime($response->last_updated);
 
-            $question->category = new Category();
+            $question->category = new Theme();
             $question->category->id = $response->id_category;
             $question->category->label = $response->label_category;
 

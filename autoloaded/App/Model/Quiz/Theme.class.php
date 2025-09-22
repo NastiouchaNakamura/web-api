@@ -4,7 +4,7 @@ namespace App\Model\Quiz;
 
 use App\Request\SqlRequest;
 
-class Category {
+class Theme {
     // Attributes
     public int $id;
     public string $label;
@@ -17,7 +17,7 @@ SELECT
     id,
     label
 FROM
-    api_quiz_categories;
+    api_quiz_themes;
 EOF
         )->execute();
 
@@ -26,7 +26,7 @@ EOF
         // Pour chaque question dans la réponse...
         foreach ($responses as $response) {
             // Instanciation de la classe bâtiment.
-            $category = new Category();
+            $category = new Theme();
 
             // Mise à jour des attributs accessibles.
             $category->id = $response->id;
