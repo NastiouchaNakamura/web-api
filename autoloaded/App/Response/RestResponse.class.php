@@ -5,7 +5,7 @@ use App\Model\GeoJson\GeoJsonGeometry;
 use DateTime;
 
 class RestResponse {
-    public static function get(int $httpCode, array $data): string {
+    public static function get(int $httpCode, $data): string {
 
         // TODO : Limiter les accès à certains domaines.
         // Allow from any origin
@@ -43,8 +43,8 @@ class RestResponse {
     }
 
     public static function encapsulateValue($instance): bool|int|float|string|null|array {
-        // Types primitifs en JSON pas besoin d'indiquer le type.
-        if (is_bool($instance) || is_int($instance) || is_float($instance) || is_string($instance)  || is_null($instance))
+        // Types primitifs en JSON (pas d'encapsulation).
+        if (is_bool($instance) || is_int($instance) || is_float($instance) || is_string($instance) || is_null($instance))
             return $instance;
 
         // Types construits à format spécial.
@@ -60,21 +60,6 @@ class RestResponse {
         // Types construits.
         else
             return RestResponse::decomposeObject($instance);
-
-        // Probablement un bug dû au match, ci-dessous ne marche pas.
-        // Problème : is_array retourne bien True quand c'est un array mais le match sélectionne le défaut quand même.
-        // TODO: Vérifier à une prochaine version de PHP si cela est corrigé.
-//        return match ($instance) {
-//            is_bool($instance) => ["type" => "boolean", "value" => $instance],
-//            is_int($instance) => ["type" => "integer", "value" => $instance],
-//            is_float($instance) => ["type" => "float", "value" => $instance],
-//            is_string($instance) => ["type" => "string", "value" => $instance],
-//            is_null($instance) => ["type" => "null"],
-//            $instance instanceof DateTime => ["type" => "dateTime", "value" => $instance->format("Y-m-d H:i:s")],
-//            $instance instanceof GeoJsonGeometry => ["type" => "geoJson", "value" => $instance->toGeoJson()],
-//            is_array($instance) => RestResponse::decomposeArray($instance),
-//            default => RestResponse::decomposeObject($instance),
-//        };
     }
 
     public static function decomposeObject($instance): array {

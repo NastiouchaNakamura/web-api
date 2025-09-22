@@ -1,10 +1,10 @@
 <?php
 namespace App\Model;
 
-class Error {
+class UserError {
     // Constructeur statique
-    public static function new(string $message): Error {
-        return new Error($message);
+    public static function new(string $message): UserError {
+        return new UserError($message);
     }
 
     // Attributs

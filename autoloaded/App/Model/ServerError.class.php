@@ -3,10 +3,10 @@ namespace App\Model;
 
 use Exception;
 
-class InternalError {
+class ServerError {
     // Constructeur statique
-    public static function new(Exception $exception): InternalError {
-        return new InternalError($exception);
+    public static function new(Exception $exception): ServerError {
+        return new ServerError($exception);
     }
 
     // Attributs
@@ -20,6 +20,10 @@ class InternalError {
     // Getteurs
     public function getCode(): int|string|null {
         return $this->exception->getCode();
+    }
+
+    public function getErrorType(): string {
+        return get_class($this->exception);
     }
 
     public function getMessage(): string {
