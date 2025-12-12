@@ -34,19 +34,37 @@ if (time() - $last_checked->getTimestamp() > 4 * 3600) {
         $githubAuthor = getenv("GITHUB_AUTHOR");
         $githubRepo = getenv("GITHUB_REPO");
 
-        $curl = curl_init();
-        curl_setopt($curl, CURLOPT_URL,"https://api.github.com/repos/$githubAuthor/$githubRepo/commits");
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($curl, CURLOPT_HTTPHEADER, ["User-Agent: $githubAuthor"]);
-        $response  = json_decode(curl_exec($curl));
-
-        $commits = $response;
-        // Compte des patchs depuis le commit de la version mineure.
         $patch_count = 0;
+        $page = 1;
         do {
-            $patch_count++;
-        } while ($commits[$patch_count]->sha != $version_file->minor_version_sha);
-        
+            // Préparation du cURL
+            $curl = curl_init();
+            curl_setopt($curl, CURLOPT_URL,"https://api.github.com/repos/$githubAuthor/$githubRepo/commits?per_page=10&page=$page");
+            curl_setopt($curl, CURLOPT_HEADER, 1);
+            curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($curl, CURLOPT_HTTPHEADER, ["User-Agent: $githubAuthor"]);
+            $page++;
+
+            // Lancement du cURL
+            $response  = curl_exec($curl);
+
+            // Lecture du body
+            $header_size = curl_getinfo($curl, CURLINFO_HEADER_SIZE);
+            $body = json_decode(substr($response, $header_size));
+
+            // Compte des patchs depuis le commit de la version mineure.
+            $i = 0;
+            $trouve = false;
+            foreach ($body as $commit) {
+                if ($commit->sha == $version_file->minor_version_sha) {
+                    $trouve = true;
+                    break;
+                } else {
+                    $patch_count++;
+                }
+            }
+        } while (!$trouve && preg_match("/link: .*rel=\"last\".*\n/", substr($response, 0, $header_size)));
+
         // Mise à jour du JSON local.
         $version_file->patch_count = $patch_count;
         $version_file->last_checked = date("Y-m-d\\TH:i:sp", time());
