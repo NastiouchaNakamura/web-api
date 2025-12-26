@@ -33,14 +33,14 @@ try {
         $realm = "NSI";
 
         // Y a-t-il un en-tête d'autorisation ?
-        if (!array_key_exists("authorization", getallheaders())) {
+        if (!array_key_exists("authorization", getallheaders()) && !array_key_exists("Authorization", getallheaders())) {
             header("WWW-Authenticate: Basic realm=\"$realm\", charset=\"UTF-8\"");
             echo RestResponse::get(401, UserError::new("POST method require authentication"));
             exit();
         }
         
         // Est-ce que l'en-tête d'autorisation a le bon format ?
-        $authorization = getallheaders()["authorization"];
+        $authorization = array_key_exists("authorization", getallheaders()) ? getallheaders()["authorization"] : getallheaders()["Authorization"];
         if (!str_starts_with($authorization, "Basic ")) {
             header("WWW-Authenticate: Basic realm=\"$realm\", charset=\"UTF-8\"");
             echo RestResponse::get(401, UserError::new("Bad HTTP authentication scheme : please use 'Basic' HTTP authentication scheme format"));
