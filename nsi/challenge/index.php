@@ -83,7 +83,7 @@ try {
     }
     
     // Enregistrement
-    Request::save($_SERVER['REMOTE_ADDR']);
+    Request::save($_SERVER['REMOTE_ADDR'], $_GET["id"]);
 
     // Vérif du flag
     $good_guess = $challenge->flag == $_GET["flag"];

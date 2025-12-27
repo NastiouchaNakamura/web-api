@@ -9,13 +9,15 @@ class Request {
     public int|null $id;
     public DateTime $dt; 
     public string $ip;
+    public string $challenge_id;
 
     public static function fetch(DateTime $since): array {
         $responses = SqlRequest::new(<<< EOF
 SELECT
     id,
     dt,
-    ip
+    ip,
+    challenge_id
 FROM
     nsi_requests
 WHERE dt > TIMESTAMP(?, ?);
@@ -28,6 +30,7 @@ EOF
             $request->id = $response->id;
             $request->dt = DateTime::createFromFormat('Y-m-d H:i:s', $response->dt);
             $request->ip = implode(".", array_map("ord", str_split($response->ip)));
+            $request->challenge_id = $response->challenge_id;
             array_push($requests, $request);
         }
 
@@ -54,7 +57,7 @@ EOF
         return !empty($responses);
     }
 
-    public static function save($ip) {
+    public static function save($ip, $challenge_id) {
         $ipInts = explode(".", $ip);
         $ipBytes = 
               chr(intval($ipInts[0]))
@@ -66,12 +69,14 @@ INSERT INTO
     nsi_requests
 (
     dt,
-    ip
+    ip,
+    challenge_id
 ) VALUES (
     TIMESTAMP(?, ?),
+    ?,
     ?
 );
 EOF
-        )->execute([(new DateTime())->format("Y-m-d"), (new DateTime())->format("H:i:s"), $ipBytes]);
+        )->execute([(new DateTime())->format("Y-m-d"), (new DateTime())->format("H:i:s"), $ipBytes, $challenge_id]);
     }
 }
