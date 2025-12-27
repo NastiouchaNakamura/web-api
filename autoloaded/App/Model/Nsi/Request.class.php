@@ -38,13 +38,6 @@ EOF
     }
 
     public static function has_requested(DateTime $since, string $ip): bool {
-        $ipInts = explode(".", $ip);
-        $ipBytes = 
-              chr(intval($ipInts[0]))
-            . chr(intval($ipInts[1]))
-            . chr(intval($ipInts[2]))
-            . chr(intval($ipInts[3]));
-        
         $responses = SqlRequest::new(<<< EOF
 SELECT
     id
@@ -52,18 +45,12 @@ FROM
     api_nsi_requests
 WHERE dt > TIMESTAMP(?, ?) AND ip = ?;
 EOF
-        )->execute([$since->format("Y-m-d"), $since->format("H:i:s"), $ipBytes]);
+        )->execute([$since->format("Y-m-d"), $since->format("H:i:s"), $ip]);
 
         return !empty($responses);
     }
 
     public static function save($ip, $challenge_id) {
-        $ipInts = explode(".", $ip);
-        $ipBytes = 
-              chr(intval($ipInts[0]))
-            . chr(intval($ipInts[1]))
-            . chr(intval($ipInts[2]))
-            . chr(intval($ipInts[3]));
         SqlRequest::new(<<< EOF
 INSERT INTO
     api_nsi_requests
@@ -77,6 +64,6 @@ INSERT INTO
     ?
 );
 EOF
-        )->execute([(new DateTime())->format("Y-m-d"), (new DateTime())->format("H:i:s"), $ipBytes, $challenge_id]);
+        )->execute([(new DateTime())->format("Y-m-d"), (new DateTime())->format("H:i:s"), $ip, $challenge_id]);
     }
 }
