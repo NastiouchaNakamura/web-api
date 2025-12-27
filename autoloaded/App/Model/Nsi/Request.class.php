@@ -19,7 +19,7 @@ SELECT
     ip,
     challenge_id
 FROM
-    nsi_requests
+    api_nsi_requests
 WHERE dt > TIMESTAMP(?, ?);
 EOF
         )->execute([$since->format("Y-m-d"), $since->format("H:i:s")]);
@@ -49,7 +49,7 @@ EOF
 SELECT
     id
 FROM
-    nsi_requests
+    api_nsi_requests
 WHERE dt > TIMESTAMP(?, ?) AND ip = ?;
 EOF
         )->execute([$since->format("Y-m-d"), $since->format("H:i:s"), $ipBytes]);
@@ -66,7 +66,7 @@ EOF
             . chr(intval($ipInts[3]));
         SqlRequest::new(<<< EOF
 INSERT INTO
-    nsi_requests
+    api_nsi_requests
 (
     dt,
     ip,

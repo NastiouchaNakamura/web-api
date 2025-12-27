@@ -17,7 +17,7 @@ SELECT
     id,
     flag
 FROM
-    nsi_challenges
+    api_nsi_challenges
 WHERE id = ?;
 EOF
         )->execute(["$id"]);
