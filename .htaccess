@@ -4,3 +4,8 @@
 ErrorDocument 403 /404_error.php
 ErrorDocument 404 /404_error.php
 #ErrorDocument 500 /errordocument.html
+
+# Serveur APACHE supprime le header Autorization pour des raisons de sécurité probablement stupides
+# https://stackoverflow.com/questions/17018586/apache-2-4-php-fpm-and-authorization-headers/17490827#17490827
+# Ci-dessous stocke le contenu du header dans $_SERVER['REDIRECT_HTTP_AUTHORIZATION'] à la place...
+SetEnvIf Authorization "(.*)" HTTP_AUTHORIZATION=$1
