@@ -32,7 +32,7 @@ try {
         }
 
         // Y a-t-il authentification ?
-        if (isset($_SERVER['REDIRECT_HTTP_AUTHORIZATION'])) { // Serveur APACHE (voir .htaccess)
+        if (!empty($_SERVER['REDIRECT_HTTP_AUTHORIZATION'])) { // Serveur APACHE (voir .htaccess)
             $authorization = $_SERVER['REDIRECT_HTTP_AUTHORIZATION'];
         } elseif (array_key_exists("authorization", getallheaders())) { // Serveur PHP & client mkdocs notamment
             $authorization = getallheaders()["authorization"];
