@@ -2,6 +2,6 @@
 .DS_Store
 secrets.php
 info.php
-.out
+out
 requests.http
 .env

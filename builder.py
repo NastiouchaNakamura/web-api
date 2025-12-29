@@ -5,7 +5,7 @@ import sys
 print("Buildotron 3000, building from sources!")
 
 input_dir = "src"
-output_dir = ".out"
+output_dir = "out"
 print(f"Executed as {' '.join(sys.argv)}, input directory: '{input_dir}', output directory: '{output_dir}' ")
 
 to_parse = [input_dir]
@@ -28,15 +28,16 @@ if os.path.exists(output_dir):
 
 built_files_count = 0
 bytes_count = 0
-for in_path in to_build:
-    os.makedirs(os.path.join(output_dir, os.path.split(in_path)[0]), exist_ok=True)
-    if in_path.endswith(".php"):
-        copyfile(in_path, os.path.join(output_dir, in_path))
+for src_path in to_build:
+    out_path = src_path.replace(input_dir, output_dir, 1)
+    os.makedirs(os.path.split(out_path)[0], exist_ok=True)
+    if src_path.endswith(".php"):
+        copyfile(src_path, out_path)
         built_files_count += 1
-        bytes_count += os.stat(os.path.join(output_dir, in_path)).st_size
+        bytes_count += os.stat(out_path).st_size
     else:
-        copyfile(in_path, os.path.join(output_dir, in_path))
+        copyfile(src_path, out_path)
         built_files_count += 1
-        bytes_count += os.stat(os.path.join(output_dir, in_path)).st_size
+        bytes_count += os.stat(out_path).st_size
 
 print(f"Build done, {built_files_count} files in final build ({bytes_count} bytes), ready to deploy!")
