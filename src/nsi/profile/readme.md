@@ -12,7 +12,7 @@ No URI parameter.
 #### Body Parameters
 | Name | Type | Description |
 |---|---|---|
-| `username` | string | Username of profile, max length 63 characters and must be non-whitespace ASCII (regex: `/[\x21-\x7E]{1,63}/`). |
+| `username` | string | Username of profile, max length 63 characters and must be non-whitespace ASCII (regex: `/[\x21-\x30\x3B-\x7E]{1,63}/`). |
 | `password` | string | Username of profile, max length 63 bytes and can contain any sequence of UTF-8 characters. |
 
 #### Responses

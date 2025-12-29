@@ -51,6 +51,45 @@ try {
             exit();
         }
 
+        // Présence prénom.
+        if (!isset($body->first_name)) {
+            echo RestResponse::get(400, UserError::new("Missing body parameter 'first_name'"));
+            exit();
+        }
+        $first_name = $body->first_name;
+
+        // Type prénom.
+        if (!is_string($first_name)) {
+            echo RestResponse::get(400, UserError::new("First name must be of type string"));
+            exit();
+        }
+
+        // Présence nom de famille.
+        if (!isset($body->last_name)) {
+            echo RestResponse::get(400, UserError::new("Missing body parameter 'last_name'"));
+            exit();
+        }
+        $last_name = $body->last_name;
+
+        // Type nom de famille.
+        if (!is_string($last_name)) {
+            echo RestResponse::get(400, UserError::new("Last name must be of type string"));
+            exit();
+        }
+
+        // Présence classe.
+        if (!isset($body->class)) {
+            echo RestResponse::get(400, UserError::new("Missing body parameter 'class'"));
+            exit();
+        }
+        $class = $body->class;
+
+        // Type classe.
+        if (!is_string($class)) {
+            echo RestResponse::get(400, UserError::new("Class must be of type string"));
+            exit();
+        }
+
         // Longueur username.
         if (strlen($username) > 63) {
             echo RestResponse::get(400, UserError::new("Username too long: must be less than 64 characters"));
@@ -58,9 +97,11 @@ try {
         }
 
         // Format username.
-        if (!preg_match("/[\x21-\x7E]+/", $username)) {
-            echo RestResponse::get(400, UserError::new("Bad username format: characters must be non-whitespace ASCII"));
-            exit();
+        foreach (str_split($username) as $b) {
+            if (ord($b) < 0x21 || ord($b) > 0x7E || ord($b) == 0x3A) {
+                echo RestResponse::get(400, UserError::new("Bad username format: characters must be non-whitespace ASCII except ':' (codepoint 0x3A)"));
+                exit();
+            }
         }
 
         // Longueur password.
@@ -76,7 +117,7 @@ try {
         }
 
         // Création !
-        Profile::create($username, password_hash($password, PASSWORD_BCRYPT, ['cost' => 12]), new Color(255, 0, 0));
+        Profile::create($username, password_hash($password, PASSWORD_BCRYPT, ['cost' => 12]), $first_name, $last_name, $class);
         echo RestResponse::get(201, null);
         exit();
     } elseif ($_SERVER['REQUEST_METHOD'] == 'PATCH') {

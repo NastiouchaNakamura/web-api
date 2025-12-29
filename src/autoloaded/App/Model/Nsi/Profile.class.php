@@ -2,13 +2,12 @@
 
 namespace App\Model\Nsi;
 
-use App\Model\Color;
+use DateTime;
 use App\Request\SqlRequest;
 
 class Profile {
     public string $username;
     public string $pw_hash;
-    public Color $color;
 
     public static function fetchByUsername(string $username): Profile|null {
         $username = str_replace(" ", "", trim($username));
@@ -17,8 +16,7 @@ class Profile {
         $responses = SqlRequest::new(<<< EOF
 SELECT
     username,
-    pw_hash,
-    color_hex
+    pw_hash
 FROM
     api_nsi_profiles
 WHERE username = ?;
@@ -31,25 +29,24 @@ EOF
             $profile = new Profile();
             $profile->username = $responses[0]->username;
             $profile->pw_hash = $responses[0]->pw_hash;
-            $profile->color = new Color(
-                hexdec(substr($responses[0]->color_hex, 1, 2)),
-                hexdec(substr($responses[0]->color_hex, 3, 2)),
-                hexdec(substr($responses[0]->color_hex, 5, 2)));
             return $profile;
         }
     }
 
-    public static function create(string $username, string $pw_hash, Color $color) {
+    public static function create(string $username, string $pw_hash, string $first_name, string $last_name, string $class) {
         $responses = SqlRequest::new(<<< EOF
 INSERT INTO
     api_nsi_profiles
 (
     username,
     pw_hash,
-    color_hex
-) VALUES (?, ?, ?);
+    first_name,
+    last_name,
+    class,
+    creation_dt
+) VALUES (?, ?, ?, ?, ?, TIMESTAMP(?, ?));
 EOF
-        )->execute([$username, $pw_hash, $color->getHex()]);
+        )->execute([$username, $pw_hash, $first_name, $last_name, $class, (new DateTime())->format("Y-m-d"), (new DateTime())->format("H:i:s")]);
     }
 
     public static function changePassword(string $username, string $pw_hash) {
