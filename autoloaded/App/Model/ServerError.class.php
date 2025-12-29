@@ -1,32 +1,32 @@
 <?php
 namespace App\Model;
 
-use Exception;
+use Throwable;
 
 class ServerError {
     // Constructeur statique
-    public static function new(Exception $exception): ServerError {
-        return new ServerError($exception);
+    public static function new(Throwable $throwable): ServerError {
+        return new ServerError($throwable);
     }
 
     // Attributs
-    private Exception $exception;
+    private Throwable $throwable;
 
     // Constructeur
-    private function __construct(Exception $exception) {
-        $this->exception = $exception;
+    private function __construct(Throwable $throwable) {
+        $this->throwable = $throwable;
     }
 
     // Getteurs
     public function getCode(): int|string|null {
-        return $this->exception->getCode();
+        return $this->throwable->getCode();
     }
 
     public function getErrorType(): string {
-        return get_class($this->exception);
+        return get_class($this->throwable);
     }
 
     public function getMessage(): string {
-        return $this->exception->getMessage();
+        return $this->throwable->getMessage();
     }
 }

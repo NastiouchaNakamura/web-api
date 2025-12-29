@@ -1,12 +1,17 @@
 # Challenge
 
+### GET Method
+
 Checks the flag of a specific challenge from NSI Website, and if authentication is provided, saves challenge's success in profile.
 
-#### Parameters
+#### URI Parameters
 | Name | Type | Description |
 |---|---|---|
 | `challenge` | string | Challenge string identifier. |
 | `flag` | string | Challenge flag to check. |
+
+#### Body Parameters
+No body parameter.
 
 #### Responses
 
