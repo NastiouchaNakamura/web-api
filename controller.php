@@ -96,4 +96,12 @@ if (time() - $last_checked->getTimestamp() > 4 * 3600) {
 ########################################################################################################################
 # Chargement de l'autoloader                                                                                           #
 ########################################################################################################################
-require $_SERVER['DOCUMENT_ROOT'] . "/autoloaded/Autoloader.class.php";
+spl_autoload_register(function ($class) {
+    $file = $_SERVER["DOCUMENT_ROOT"] . "/autoloaded/" . str_replace('\\', DIRECTORY_SEPARATOR, $class) . ".class.php";
+    if (file_exists($file)) {
+        require $file;
+        return true;
+    } else {
+        return false;
+    }
+});
