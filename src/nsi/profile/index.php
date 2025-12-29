@@ -110,6 +110,24 @@ try {
             exit();
         }
 
+        // Longueur prénom.
+        if (strlen($first_name) > 255) {
+            echo RestResponse::get(400, UserError::new("First name too long: must be less than 256 bytes"));
+            exit();
+        }
+
+        // Longueur nom de famille.
+        if (strlen($last_name) > 255) {
+            echo RestResponse::get(400, UserError::new("Last name too long: must be less than 256 bytes"));
+            exit();
+        }
+
+        // Longueur classe.
+        if (strlen($class) > 255) {
+            echo RestResponse::get(400, UserError::new("Class too long: must be less than 256 bytes"));
+            exit();
+        }
+
         // Déjà pris ?
         if (!is_null(Profile::fetchByUsername($username))) {
             echo RestResponse::get(409, UserError::new("Username '$username' is already used"));
