@@ -4,7 +4,7 @@ import sys
 
 print("Buildotron 3000, building from sources!")
 
-input_dir = "."
+input_dir = "src"
 output_dir = ".out"
 print(f"Executed as {' '.join(sys.argv)}, input directory: '{input_dir}', output directory: '{output_dir}' ")
 
