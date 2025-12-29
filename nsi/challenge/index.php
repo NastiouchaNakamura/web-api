@@ -2,6 +2,7 @@
 require $_SERVER["DOCUMENT_ROOT"] . "/controller.php";
 
 use App\Model\Nsi\Challenge;
+use App\Model\Nsi\Profile;
 use App\Model\Nsi\Request;
 use App\Model\UserError;
 use App\Model\ServerError;
@@ -25,25 +26,20 @@ try {
         exit();
     }
 
-    // Méthode POST ? Si oui alors authentification requise
-    $authenticated = false;
-    if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    // Y a-t-il authentification ?
+    if (isset($_SERVER['REDIRECT_HTTP_AUTHORIZATION'])) { // Serveur APACHE (voir .htaccess)
+        $authorization = $_SERVER['REDIRECT_HTTP_AUTHORIZATION'];
+    } elseif (array_key_exists("authorization", getallheaders())) { // Serveur PHP & client mkdocs notamment
+        $authorization = getallheaders()["authorization"];
+    } elseif (array_key_exists("Authorization", getallheaders())) { // Serveur PHP & client classique
+        $authorization = getallheaders()["Authorization"];
+    }
+    
+    // Vérifications d'authentification.
+    if (isset($authorization)) {
         // Authentification standard 'Basic' (RFC-7617)
         // https://datatracker.ietf.org/doc/html/rfc7617
         $realm = "NSI";
-
-        // Y a-t-il un en-tête d'autorisation ?
-        if (isset($_SERVER['REDIRECT_HTTP_AUTHORIZATION'])) { // Serveur APACHE (voir .htaccess)
-            $authorization = $_SERVER['REDIRECT_HTTP_AUTHORIZATION'];
-        } elseif (array_key_exists("authorization", getallheaders())) { // Serveur PHP & client mkdocs notamment
-            $authorization = getallheaders()["authorization"];
-        } elseif (array_key_exists("Authorization", getallheaders())) { // Serveur PHP & client classique
-            $authorization = getallheaders()["Authorization"];
-        } else {
-            header("WWW-Authenticate: Basic realm=\"$realm\", charset=\"UTF-8\"");
-            echo RestResponse::get(401, UserError::new("POST method require authentication"));
-            exit();
-        }
         
         // Est-ce que l'en-tête d'autorisation a le bon format ?
         if (!str_starts_with($authorization, "Basic ")) {
@@ -62,14 +58,13 @@ try {
 
         // Est-ce que ces identifiants sont corrects ?
         [$username, $password] = explode(":", $credentials);
-        // Check authentication TODO
-        if ($username != "toto" || $password != "admin") {
+        $profile = Profile::fetchByUsername($username);
+        //$hsh = password_hash($password, PASSWORD_BCRYPT, ['cost' => 12]);
+        if (!password_verify($password, $profile->pw_hash)) {
             header("WWW-Authenticate: Basic realm=\"$realm\", charset=\"UTF-8\"");
             echo RestResponse::get(401, UserError::new("Bad credentials"));
             exit();
         }
-
-        $authenticated = true;
     }
     
     // Récupération du challenge
@@ -97,7 +92,7 @@ try {
     echo RestResponse::get(200, $good_guess);
 
     // Enregistrement de l'étoile
-    if ($good_guess && $authenticated) {
+    if ($good_guess && isset($profile)) {
         // Save result TODO
     }
 

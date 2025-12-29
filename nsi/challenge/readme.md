@@ -14,7 +14,7 @@ Checks the flag of a specific challenge from NSI Website, and if authentication 
 |---|---|---|
 | 200 | `boolean` | If no error is made. |
 | 400 | `UserError` | A required parameter is missing or has an incorrect type or format. |
-| 401 | `UserError` | Used POST method without providing credentials or bad credentials (must use 'Basic' HTTP authentication scheme described in [RFC-7617](https://datatracker.ietf.org/doc/html/rfc7617) with `NSI` as realm). |
+| 401 | `UserError` | Used 'Authorization' header using bad scheme, without providing credentials or using bad credentials (must use 'Basic' HTTP authentication scheme described in [RFC-7617](https://datatracker.ietf.org/doc/html/rfc7617) with `NSI` as realm). |
 | 404 | `UserError` | The ID given as parameters does not correspond to an existing challenge. |
 | 405 | `UserError` | HTTP method is not allowed. |
 | 429 | `UserError` | Too many request : only one request per minute is allowed. |
