@@ -41,4 +41,17 @@ EOF
             return $profile;
         }
     }
+
+    public static function create(string $username, string $pw_hash, Color $color) {
+        $responses = SqlRequest::new(<<< EOF
+INSERT INTO
+    api_nsi_profiles
+(
+    username,
+    pw_hash,
+    color_hex
+) VALUES (?, ?, ?);
+EOF
+        )->execute([$username, $pw_hash, $color->getHex()]);
+    }
 }

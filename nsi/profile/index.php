@@ -1,6 +1,7 @@
 <?php
 require $_SERVER["DOCUMENT_ROOT"] . "/controller.php";
 
+use App\Model\Color;
 use App\Model\Nsi\Challenge;
 use App\Model\Nsi\Profile;
 use App\Model\Nsi\Request;
@@ -75,7 +76,7 @@ try {
         }
 
         // Création !
-        // TODO
+        Profile::create($username, password_hash($password, PASSWORD_BCRYPT, ['cost' => 12]), new Color(255, 0, 0));
         echo RestResponse::get(201, null);
         exit();
     } else {

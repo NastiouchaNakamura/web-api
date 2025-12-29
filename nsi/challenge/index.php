@@ -64,7 +64,6 @@ try {
             // Est-ce que ces identifiants sont corrects ?
             [$username, $password] = explode(":", $credentials);
             $profile = Profile::fetchByUsername($username);
-            //$hsh = password_hash($password, PASSWORD_BCRYPT, ['cost' => 12]);
             if (!password_verify($password, $profile->pw_hash)) {
                 header("WWW-Authenticate: Basic realm=\"$realm\", charset=\"UTF-8\"");
                 echo RestResponse::get(401, UserError::new("Bad credentials"));
