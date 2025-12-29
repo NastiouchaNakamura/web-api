@@ -6,7 +6,6 @@ use App\Model\Color;
 use App\Request\SqlRequest;
 
 class Profile {
-    public string $id;
     public string $username;
     public string $pw_hash;
     public Color $color;
@@ -17,7 +16,6 @@ class Profile {
         
         $responses = SqlRequest::new(<<< EOF
 SELECT
-    id,
     username,
     pw_hash,
     color_hex
@@ -31,7 +29,6 @@ EOF
             return null;
         } else {
             $profile = new Profile();
-            $profile->id = $responses[0]->id;
             $profile->username = $responses[0]->username;
             $profile->pw_hash = $responses[0]->pw_hash;
             $profile->color = new Color(
@@ -53,5 +50,17 @@ INSERT INTO
 ) VALUES (?, ?, ?);
 EOF
         )->execute([$username, $pw_hash, $color->getHex()]);
+    }
+
+    public static function changePassword(string $username, string $pw_hash) {
+        $responses = SqlRequest::new(<<< EOF
+UPDATE
+    api_nsi_profiles
+SET
+    pw_hash = ?
+WHERE
+    username = ?;
+EOF
+        )->execute([$pw_hash, $username]);
     }
 }
