@@ -12,34 +12,6 @@ class Request {
     public string $challenge_id;
     public string $username;
 
-    public static function fetch(DateTime $since): array {
-        $responses = SqlRequest::new(<<< EOF
-SELECT
-    id,
-    dt,
-    ip,
-    challenge_id,
-    username
-FROM
-    api_nsi_requests
-WHERE dt > TIMESTAMP(?, ?);
-EOF
-        )->execute([$since->format("Y-m-d"), $since->format("H:i:s")]);
-
-        $requests = [];
-        foreach ($responses as $response) {
-            $request = new Request();
-            $request->id = $response->id;
-            $request->dt = DateTime::createFromFormat('Y-m-d H:i:s', $response->dt);
-            $request->ip = $response->ip;
-            $request->challenge_id = $response->challenge_id;
-            $request->username = $response->username;
-            array_push($requests, $request);
-        }
-
-        return $requests;
-    }
-
     public static function has_requested_anonymously(DateTime $since, string $ip): bool {
         $responses = SqlRequest::new(<<< EOF
 SELECT
