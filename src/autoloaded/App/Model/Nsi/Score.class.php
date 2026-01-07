@@ -41,7 +41,6 @@ class Score {
                     username,
                     challenge_id,
                     dt,
-                    star_type,
                     stars_count
                 FROM
                     sandbox.api_nsi_stars
@@ -70,9 +69,10 @@ class Score {
                 username,
                 challenge_id,
                 dt,
-                star_type,
                 stars_count,
-                title
+                title,
+                diamond_deadline_dt,
+                gold_deadline_dt
             FROM
                 sandbox.api_nsi_stars
                     JOIN
@@ -86,8 +86,13 @@ class Score {
             $star = new Star();
             $star->challenge_id = $response->challenge_id;
             $star->challenge_title = $response->title;
-            $star->dt = DateTime::createFromFormat('Y-m-d H:i:s', $response->dt);
-            $star->type = $response->star_type;
+            $star->dt = new DateTime($response->dt);
+            if ($star->dt < new DateTime($response->diamond_deadline_dt))
+                $star->type = "DIAMOND";
+            elseif ($star->dt < new DateTime($response->gold_deadline_dt))
+                $star->type = "GOLD";
+            else
+                $star->type = "BASIC";
             $star->amount = $response->stars_count;
             array_push($best_scores[$response->username]->stars, $star);
         }

@@ -15,7 +15,7 @@ class Star {
     public static function has_been_obtained(string $username, string $challenge_id): bool {
         $responses = SqlRequest::new(<<< EOF
             SELECT
-                star_type
+                stars_count
             FROM
                 api_nsi_stars
             WHERE username = ? AND challenge_id = ?;
@@ -25,15 +25,14 @@ class Star {
         return !empty($responses);
     }
 
-    public static function save(string $username, string $challenge_id, string $type): void {
+    public static function save(string $username, string $challenge_id): void {
         SqlRequest::new(<<< EOF
             INSERT INTO
                 api_nsi_stars
             (
                 username,
                 challenge_id,
-                dt,
-                star_type
+                dt
             ) VALUES (
                 ?,
                 ?,
@@ -41,6 +40,6 @@ class Star {
                 ?
             );
             EOF
-        )->execute([$username, $challenge_id, (new DateTime())->format("Y-m-d"), (new DateTime())->format("H:i:s"), $type]);
+        )->execute([$username, $challenge_id, (new DateTime())->format("Y-m-d"), (new DateTime())->format("H:i:s")]);
     }
 }

@@ -3,10 +3,15 @@
 namespace App\Model\Nsi;
 
 use App\Request\SqlRequest;
+use DateTime;
 
 class Challenge {
     public string $id;
     public string $flag;
+    public string $stars_count;
+    public string $title;
+    public DateTime $diamond_deadline_dt;
+    public DateTime $gold_deadline_dt;
 
     public static function fetch(string $id): Challenge|null {
         $id = str_replace(" ", "", trim($id));
@@ -15,7 +20,11 @@ class Challenge {
         $responses = SqlRequest::new(<<< EOF
             SELECT
                 id,
-                flag
+                flag,
+                stars_count,
+                title,
+                diamond_deadline_dt,
+                gold_deadline_dt
             FROM
                 api_nsi_challenges
             WHERE id = ?;
@@ -28,6 +37,9 @@ class Challenge {
             $challenge = new Challenge();
             $challenge->id = $responses[0]->id;
             $challenge->flag = $responses[0]->flag;
+            $challenge->title = $responses[0]->title;
+            $challenge->diamond_deadline_dt = new DateTime($responses[0]->diamond_deadline_dt);
+            $challenge->gold_deadline_dt = new DateTime($responses[0]->gold_deadline_dt);
             return $challenge;
         }
     }

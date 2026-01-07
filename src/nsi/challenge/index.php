@@ -80,7 +80,7 @@ try {
 
         // Enregistrement de l'étoile
         if ($good_guess && isset($profile) && !Star::has_been_obtained($profile->username, $challenge->id)) {
-            Star::save($profile->username, $challenge->id, "BASIC");
+            Star::save($profile->username, $challenge->id);
         }
 
         // Réponse HTTP
