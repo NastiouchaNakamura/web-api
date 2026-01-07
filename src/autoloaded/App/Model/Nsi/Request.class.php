@@ -46,7 +46,7 @@ SELECT
     id
 FROM
     api_nsi_requests
-WHERE dt > TIMESTAMP(?, ?) AND ip = ? AND username = NULL;
+WHERE dt > TIMESTAMP(?, ?) AND ip = ? AND username IS NULL;
 EOF
         )->execute([$since->format("Y-m-d"), $since->format("H:i:s"), $ip]);
 
