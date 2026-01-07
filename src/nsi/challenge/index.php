@@ -12,24 +12,18 @@ try {
     // Méthode GET
     if ($_SERVER['REQUEST_METHOD'] == 'GET') {
         // Vérifications des paramètres
-        if (!isset($_GET["id"])) {
-            echo RestResponse::get(400, UserError::new("Missing URI parameter 'id': challenge ID as string 'id' must be provided"));
-            exit();
-        }
+        if (!isset($_GET["id"]))
+            RestResponse::set(400, UserError::new("Missing URI parameter 'id': challenge ID as string 'id' must be provided"));
 
-        if (!isset($_GET["flag"])) {
-            echo RestResponse::get(400, UserError::new("Missing URI parameter 'flag': answer flag as string 'flag' must be provided"));
-            exit();
-        }
+        if (!isset($_GET["flag"]))
+            RestResponse::set(400, UserError::new("Missing URI parameter 'flag': answer flag as string 'flag' must be provided"));
 
         // Récupération du challenge
         $challenge = Challenge::fetch($_GET["id"]);
 
         // Le challenge existe-t-il ?
-        if (is_null($challenge)) {
-            echo RestResponse::get(404, UserError::new("Challenge of id '$id' not found"));
-            exit();
-        }
+        if (is_null($challenge))
+            RestResponse::set(404, UserError::new("Challenge of id '$id' not found"));
 
         // Y a-t-il authentification ?
         if (!empty($_SERVER['REDIRECT_HTTP_AUTHORIZATION'])) { // Serveur APACHE (voir .htaccess)
@@ -49,16 +43,14 @@ try {
             // Est-ce que l'en-tête d'autorisation a le bon format ?
             if (!str_starts_with($authorization, "Basic ")) {
                 header("WWW-Authenticate: Basic realm=\"$realm\", charset=\"UTF-8\"");
-                echo RestResponse::get(401, UserError::new("Bad HTTP authentication scheme: please use 'Basic' HTTP authentication scheme format"));
-                exit();
+                RestResponse::set(401, UserError::new("Bad HTTP authentication scheme: please use 'Basic' HTTP authentication scheme format"));
             }
 
             // Est-ce que les identifiants sont correctement encodés en base64 ?
             $credentials = base64_decode(substr($authorization, 6), true);
             if ($credentials == false) {
                 header("WWW-Authenticate: Basic realm=\"$realm\", charset=\"UTF-8\"");
-                echo RestResponse::get(401, UserError::new("Bad credential format: please use 'Basic' HTTP authentication scheme format"));
-                exit();
+                RestResponse::set(401, UserError::new("Bad credential format: please use 'Basic' HTTP authentication scheme format"));
             }
 
             // Est-ce que ces identifiants sont corrects ?
@@ -66,22 +58,17 @@ try {
             $profile = Profile::fetchByUsername($username);
             if (!password_verify($password, $profile->pw_hash)) {
                 header("WWW-Authenticate: Basic realm=\"$realm\", charset=\"UTF-8\"");
-                echo RestResponse::get(401, UserError::new("Bad credentials"));
-                exit();
+                RestResponse::set(401, UserError::new("Bad credentials"));
             }
         }
 
         // Limite de requêtes (empêcher le bruteforce)
         if (isset($profile)) {
-            if (Request::has_requested_authentified((new DateTime())->sub(DateInterval::createFromDateString('1 minute')), $profile->username)) {
-                echo RestResponse::get(429, UserError::new("Too many requests! Please wait one full minute between each request"));
-                exit();
-            }
+            if (Request::has_requested_authentified((new DateTime())->sub(DateInterval::createFromDateString('1 minute')), $profile->username))
+                RestResponse::set(429, UserError::new("Too many requests! Please wait one full minute between each request"));
         } else {
-            if (Request::has_requested_anonymously((new DateTime())->sub(DateInterval::createFromDateString('1 minute')), $_SERVER['REMOTE_ADDR'])) {
-                echo RestResponse::get(429, UserError::new("Too many requests! Please wait one full minute between each request"));
-                exit();
-            }
+            if (Request::has_requested_anonymously((new DateTime())->sub(DateInterval::createFromDateString('1 minute')), $_SERVER['REMOTE_ADDR']))
+                RestResponse::set(429, UserError::new("Too many requests! Please wait one full minute between each request"));
         }
         
         // Enregistrement de la requête
@@ -96,12 +83,11 @@ try {
         }
 
         // Réponse HTTP
-        echo RestResponse::get(200, $good_guess);
-        exit();
+        RestResponse::set(200, $good_guess);
+        
     } else {
-        echo RestResponse::get(405, UserError::new("Method " . $_SERVER['REQUEST_METHOD'] . " is not allowed"));
-        exit();
+        RestResponse::set(405, UserError::new("Method " . $_SERVER['REQUEST_METHOD'] . " is not allowed"));
     }
 } catch (Throwable $throwable) {
-    echo RestResponse::get(500, ServerError::new($throwable));
+    RestResponse::set(500, ServerError::new($throwable));
 }
