@@ -84,11 +84,6 @@ try {
             }
         }
         
-        if (Request::has_requested((new DateTime())->sub(DateInterval::createFromDateString('1 minute')), $_SERVER['REMOTE_ADDR'])) {
-            echo RestResponse::get(429, UserError::new("Too many requests! Please wait one full minute between each request"));
-            exit();
-        }
-        
         // Enregistrement de la requête
         Request::save($_SERVER['REMOTE_ADDR'], $_GET["id"], $profile->username ?? null);
 
