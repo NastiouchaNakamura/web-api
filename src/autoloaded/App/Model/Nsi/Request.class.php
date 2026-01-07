@@ -31,7 +31,7 @@ EOF
             $request = new Request();
             $request->id = $response->id;
             $request->dt = DateTime::createFromFormat('Y-m-d H:i:s', $response->dt);
-            $request->ip = implode(".", array_map("ord", str_split($response->ip)));
+            $request->ip = $response->ip;
             $request->challenge_id = $response->challenge_id;
             $request->username = $response->username;
             array_push($requests, $request);
