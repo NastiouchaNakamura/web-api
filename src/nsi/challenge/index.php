@@ -77,8 +77,8 @@ try {
             exit();
         }
         
-        // Enregistrement
-        Request::save($_SERVER['REMOTE_ADDR'], $_GET["id"]);
+        // Enregistrement de la requête
+        Request::save($_SERVER['REMOTE_ADDR'], $_GET["id"], $profile->username ?? null);
 
         // Vérif du flag
         $good_guess = $challenge->flag == $_GET["flag"];
