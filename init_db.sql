@@ -3,6 +3,9 @@ CREATE TABLE IF NOT EXISTS sandbox.api_nsi_challenges (
 	id varchar(63) NOT NULL,
 	flag varchar(63) NOT NULL,
 	stars_count tinyint unsigned NOT NULL,
+	title varchar(63) NOT NULL,
+	diamond_deadline_dt DATETIME NOT NULL,
+	gold_deadline_dt DATETIME NOT NULL,
 	CONSTRAINT `PRIMARY` PRIMARY KEY (id)
 );
 
@@ -22,7 +25,6 @@ CREATE TABLE IF NOT EXISTS sandbox.api_nsi_requests (
 	id int auto_increment NOT NULL,
 	dt datetime NOT NULL,
 	ip varchar(39) NOT NULL,
-	session_id varchar(255) NOT NULL,
 	challenge_id varchar(63) NOT NULL,
 	username varchar(63) NULL,
 	CONSTRAINT `PRIMARY` PRIMARY KEY (id),
@@ -35,7 +37,6 @@ CREATE TABLE IF NOT EXISTS sandbox.api_nsi_stars (
 	username varchar(63) NOT NULL,
 	challenge_id varchar(63) NOT NULL,
 	dt DATETIME NOT NULL,
-	star_type ENUM('DIAMOND', 'GOLD', 'BASIC') NOT NULL,
 	CONSTRAINT api_nsi_stars_pk PRIMARY KEY (username, challenge_id),
 	CONSTRAINT api_nsi_stars_api_nsi_profiles_FK FOREIGN KEY (username) REFERENCES sandbox.api_nsi_profiles(username) ON DELETE CASCADE ON UPDATE CASCADE,
 	CONSTRAINT api_nsi_stars_api_nsi_challenges_FK FOREIGN KEY (challenge_id) REFERENCES sandbox.api_nsi_challenges(id) ON DELETE CASCADE ON UPDATE CASCADE
