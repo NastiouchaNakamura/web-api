@@ -4,12 +4,28 @@ namespace App\Request;
 use PDO;
 use PDOException;
 
+/**
+ * Class used to send SQL requests to SQL server and return response as PHP
+ * object
+ * 
+ * Usage : create SqlRequest instance using static 'new' method with SQL query
+ * as string argument, using '?' character for each prepared variable, then use
+ * 'execute' method with array of prepared variable values, in the same order
+ * as the SQL statement, as argument.
+ *
+ * Example :
+ * <code>$responses = SqlRequest::new("SELECT id, flag FROM api_nsi_challenges CHERE id = ?;")->execute(["$id"]);</code>
+ */
 class SqlRequest {
-    // Constructeur statique
+    private PDO $pdo;
+    private string $sqlScript;
+
     /**
      * Create new SqlRequest instance
-     * Environment variables "SQL_HOST", "SQL_PORT", "SQL_DATABASE", "SQL_USER" and "SQL_PASSWORD" have to be set before
-     * call
+     * 
+     * Environment variables "SQL_HOST", "SQL_PORT", "SQL_DATABASE", "SQL_USER"
+     * and "SQL_PASSWORD" have to be set before call
+     * 
      * @param string $sqlScript SQL script to be executed
      * @return SqlRequest the SqlRequest instance ready for use
      * @throws PDOException when an exception occurs on initial connection
@@ -18,11 +34,6 @@ class SqlRequest {
         return new SqlRequest($sqlScript);
     }
 
-    // Attributs
-    private PDO $pdo;
-    private string $sqlScript;
-
-    // Constructeur
     /**
      * See SqlRequest::new for documentation
      */
@@ -39,20 +50,19 @@ class SqlRequest {
         $this->sqlScript = trim(preg_replace("/\s+/", " ", $sqlScript));
     }
 
-    // Méthodes
-
     /**
      * Executes the SQL script (given on construct) into the database
-     * @param array $variables array of variables: each "?" in the SQL script will be replaced by the values of the
-     * array, in the same order
-     * @param int $max maximum returned items; defaults to 0 for no maximum
-     * @return array array of returned items, each one typed as an object which attributes corresponds to the columns of
-     * the SQL response, and an additional attribute "count" on each object that is the index of the object in the
-     * response (starting at 0)
+     * 
+     * @param array $variables array of variables: each '?' in the SQL script
+     * will be replaced by the values of the array, in the same order
+     * @return array array of returned items, each one typed as an object which
+     * attributes corresponds to the columns of the SQL response, and an
+     * additional attribute 'index' on each object that is the index of the
+     * object in the response (starting at 0)
      * @throws PDOException
      */
-    public function execute(array $variables = array(), int $max = 0): array {
-        $prepare = $this->pdo->prepare($this->sqlScript . ($max != 0 ? " LIMIT $max" : ""));
+    public function execute(array $variables = array()): array {
+        $prepare = $this->pdo->prepare($this->sqlScript);
 
         try {
             foreach ($variables as $index => $variable) {
@@ -68,7 +78,7 @@ class SqlRequest {
 
             $results = array();
             foreach ($prepare->fetchAll() as $index => $item) {
-                $item["count"] = $index;
+                $item["index"] = $index;
                 $results[] = (object) $item;
             }
         } finally {
