@@ -36,8 +36,7 @@ class Star {
             ) VALUES (
                 ?,
                 ?,
-                TIMESTAMP(?, ?),
-                ?
+                TIMESTAMP(?, ?)
             );
             EOF
         )->execute([$username, $challenge_id, (new DateTime())->format("Y-m-d"), (new DateTime())->format("H:i:s")]);
