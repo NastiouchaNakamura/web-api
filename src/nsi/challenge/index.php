@@ -4,6 +4,7 @@ require $_SERVER["DOCUMENT_ROOT"] . "/controller.php";
 use App\Model\Nsi\Challenge;
 use App\Model\Nsi\Profile;
 use App\Model\Nsi\Request;
+use App\Model\Nsi\Star;
 use App\Model\UserError;
 use App\Model\ServerError;
 use App\Response\RestResponse;
@@ -78,8 +79,8 @@ try {
         $good_guess = $challenge->flag == $_GET["flag"];
 
         // Enregistrement de l'étoile
-        if ($good_guess && isset($profile)) {
-            // Save result TODO
+        if ($good_guess && isset($profile) && !Star::has_been_obtained($profile->username, $challenge->id)) {
+            Star::save($profile->username, $challenge->id, "BASIC");
         }
 
         // Réponse HTTP
