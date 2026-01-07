@@ -8,12 +8,12 @@ use PDOException;
  * Class used to send SQL requests to SQL server and return response as PHP
  * object
  * 
- * Usage : create SqlRequest instance using static 'new' method with SQL query
+ * Usage: create SqlRequest instance using static 'new' method with SQL query
  * as string argument, using '?' character for each prepared variable, then use
  * 'execute' method with array of prepared variable values, in the same order
  * as the SQL statement, as argument.
  *
- * Example :
+ * Example:
  * <code>$responses = SqlRequest::new("SELECT id, flag FROM api_nsi_challenges CHERE id = ?;")->execute(["$id"]);</code>
  */
 class SqlRequest {
