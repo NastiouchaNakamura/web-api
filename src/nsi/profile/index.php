@@ -1,10 +1,7 @@
 <?php
 require $_SERVER["DOCUMENT_ROOT"] . "/controller.php";
 
-use App\Model\Color;
-use App\Model\Nsi\Challenge;
 use App\Model\Nsi\Profile;
-use App\Model\Nsi\Request;
 use App\Model\UserError;
 use App\Model\ServerError;
 use App\Response\RestResponse;
