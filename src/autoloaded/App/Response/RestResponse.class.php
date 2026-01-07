@@ -9,10 +9,11 @@ class RestResponse {
         header("Content-Type: application/json; charset=UTF-8");
         http_response_code($httpCode);
         $meta["source_url"] = (empty($_SERVER["HTTPS"]) ? "http" : "https") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+        $meta["author"] = "Anaël BARODINE";
         $meta["start"] = $_SERVER["REQUEST_TIME_FLOAT"];
         $meta["end"] = microtime(true);
         $meta["version"] = VERSION;
-        $meta["author"] = "Anaël BARODINE";
+        $meta["build"] = BUILD_SHA;
 
         return json_encode(
             array(
