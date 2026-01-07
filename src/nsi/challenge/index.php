@@ -72,6 +72,18 @@ try {
         }
 
         // Limite de requêtes (empêcher le bruteforce)
+        if (isset($profile)) {
+            if (Request::has_requested_authentified((new DateTime())->sub(DateInterval::createFromDateString('1 minute')), $profile->username)) {
+                echo RestResponse::get(429, UserError::new("Too many requests! Please wait one full minute between each request"));
+                exit();
+            }
+        } else {
+            if (Request::has_requested_anonymously((new DateTime())->sub(DateInterval::createFromDateString('1 minute')), $_SERVER['REMOTE_ADDR'])) {
+                echo RestResponse::get(429, UserError::new("Too many requests! Please wait one full minute between each request"));
+                exit();
+            }
+        }
+        
         if (Request::has_requested((new DateTime())->sub(DateInterval::createFromDateString('1 minute')), $_SERVER['REMOTE_ADDR'])) {
             echo RestResponse::get(429, UserError::new("Too many requests! Please wait one full minute between each request"));
             exit();
