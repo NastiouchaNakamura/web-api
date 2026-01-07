@@ -17,9 +17,9 @@ jobs:
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
       - name: Set version in controller code
-        run: sed -i '' -e "s/const VERSION = \".*\";/const VERSION = \"$(cat version)\";/g" ./src/controller.php
+        run: sed -i "s/const VERSION = \".*\";/const VERSION = \"$(cat version)\";/g" ./src/controller.php
       - name: Set SHA in controller code
-        run: sed -i '' -e "s/const BUILD_SHA = \".*\";/const BUILD_SHA = \"${{ github.sha }}\";/g" ./src/controller.php
+        run: sed -i "s/const BUILD_SHA = \".*\";/const BUILD_SHA = \"${{ github.sha }}\";/g" ./src/controller.php
       - name: Setup of Python 3
         uses: actions/setup-python@v6
         with:
