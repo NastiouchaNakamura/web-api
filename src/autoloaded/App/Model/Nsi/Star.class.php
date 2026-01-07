@@ -15,7 +15,7 @@ class Star {
     public static function has_been_obtained(string $username, string $challenge_id): bool {
         $responses = SqlRequest::new(<<< EOF
             SELECT
-                stars_count
+                dt
             FROM
                 api_nsi_stars
             WHERE username = ? AND challenge_id = ?;
