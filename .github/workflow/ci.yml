@@ -1,0 +1,69 @@
+name: ci 
+on:
+  push:
+    branches:
+      - main
+permissions:
+  contents: write
+jobs:
+  setup:
+    name: "Build API"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout of repo's 'main' branch
+        uses: actions/checkout@v4
+      - name: Configure Git Credentials
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+      - name: Setup of Python 3
+        uses: actions/setup-python@v6
+        with:
+          python-version: 3.x
+      #- name: Installation of Python packages from requirements.txt
+      #  run: pip install -r requirements.txt
+      - name: Build API from Python script file.
+        run: python3 builder.py
+      - name: Artifact creation
+        uses:  actions/upload-artifact@v6
+        with:
+          name: api-build
+          path: ./out/
+          if-no-files-found: error
+          overwrite: true
+          include-hidden-files: true
+  deploy:
+    name: "Deployment on SFTP server"
+    runs-on: ubuntu-latest
+    needs: setup
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v7
+        with:
+          name: api-build
+          path: ./out/
+      # Ne fonctionne pas car l'action ne prend pas en charge SFTP en mode passif
+      # - name: Upload to FTP server
+      #   uses: SamKirkland/FTP-Deploy-Action@v4.1.0 # https://github.com/marketplace/actions/ftp-deploy
+      #   with:
+      #     server: ${{ secrets.ftp_host }}
+      #     username: ${{ secrets.ftp_username }}
+      #     password: ${{ secrets.ftp_password }}
+      #     port: ${{ secrets.ftp_port }}
+      #     protocol: ${{ secrets.ftp_protocol }}
+      #     #local-dir: ./out/
+      #     server-dir: ${{ secrets.ftp_destination }}
+      #     #dangerous-clean-slate: true
+      #     log-level: verbose
+      - name: Upload to FTP server
+        uses: sand4rt/ftp-deployer@v1.8
+        with:
+          sftp: true
+          host: ${{ secrets.ftp_host }}
+          port: ${{ secrets.ftp_port }}
+          username: ${{ secrets.ftp_username }}
+          password: ${{ secrets.ftp_password }}
+          remote_folder: ${{ secrets.ftp_destination }}
+          local_folder: ./out/
+          cleanup: true
+          passive: true
