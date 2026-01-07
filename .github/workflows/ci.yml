@@ -71,6 +71,7 @@ jobs:
           port: ${{ secrets.ftp_port }}
           username: ${{ secrets.ftp_username }}
           password: ${{ secrets.ftp_password }}
+          include: '["*", "**/*", ".*"]' # Sinon les fichiers cachés .* ne sont pas inclus
           remote_folder: ${{ secrets.ftp_destination }}
           local_folder: ./out/
           cleanup: true
