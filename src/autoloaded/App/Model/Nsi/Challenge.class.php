@@ -13,13 +13,13 @@ class Challenge {
         if (empty($id)) return null;
         
         $responses = SqlRequest::new(<<< EOF
-SELECT
-    id,
-    flag
-FROM
-    api_nsi_challenges
-WHERE id = ?;
-EOF
+            SELECT
+                id,
+                flag
+            FROM
+                api_nsi_challenges
+            WHERE id = ?;
+            EOF
         )->execute(["$id"]);
 
         if (empty($responses)) {
