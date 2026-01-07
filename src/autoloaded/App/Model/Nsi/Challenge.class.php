@@ -29,7 +29,7 @@ class Challenge {
                 api_nsi_challenges
             WHERE id = ?;
             EOF
-        )->execute(["$id"]);
+        )->execute([$id]);
 
         if (empty($responses)) {
             return null;
@@ -37,6 +37,7 @@ class Challenge {
             $challenge = new Challenge();
             $challenge->id = $responses[0]->id;
             $challenge->flag = $responses[0]->flag;
+            $challenge->stars_count = $responses[0]->stars_count;
             $challenge->title = $responses[0]->title;
             $challenge->diamond_deadline_dt = new DateTime($responses[0]->diamond_deadline_dt);
             $challenge->gold_deadline_dt = new DateTime($responses[0]->gold_deadline_dt);
