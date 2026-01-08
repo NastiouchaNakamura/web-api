@@ -49,7 +49,7 @@ class Score {
                     FROM
                         api_nsi_stars
                             JOIN
-                        sandbox.api_nsi_challenges
+                        api_nsi_challenges
                             ON api_nsi_stars.challenge_id = api_nsi_challenges.id
                     ) AS all_stars_by_username
                 GROUP BY
