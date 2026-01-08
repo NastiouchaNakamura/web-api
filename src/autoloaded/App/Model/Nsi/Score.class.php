@@ -35,23 +35,32 @@ class Score {
         $responses = SqlRequest::new(<<< EOF
             SELECT
                 username,
-                SUM(stars_count) AS total_stars
-            FROM
-                (SELECT
-                    username,
-                    challenge_id,
-                    dt,
-                    stars_count
-                FROM
-                    sandbox.api_nsi_stars
-                        JOIN
-                    sandbox.api_nsi_challenges
-                        ON sandbox.api_nsi_stars.challenge_id = sandbox.api_nsi_challenges.id
-                ) AS all_stars_by_username
-            GROUP BY
-                username
-            ORDER BY
                 total_stars
+            FROM (
+                SELECT
+                    username,
+                    SUM(stars_count) AS total_stars
+                FROM (
+                    SELECT
+                        username,
+                        challenge_id,
+                        dt,
+                        stars_count
+                    FROM
+                        sandbox.api_nsi_stars
+                            JOIN
+                        sandbox.api_nsi_challenges
+                            ON sandbox.api_nsi_stars.challenge_id = sandbox.api_nsi_challenges.id
+                    ) AS all_stars_by_username
+                GROUP BY
+                    username
+                ORDER BY
+                    total_stars
+                ) stars_of_username
+                    NATURAL JOIN
+                sandbox.api_nsi_profiles
+            WHERE
+                displayable = 1
             LIMIT ?;
             EOF
         )->execute([$limit]);

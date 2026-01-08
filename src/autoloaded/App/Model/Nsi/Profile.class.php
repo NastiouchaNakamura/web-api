@@ -9,6 +9,7 @@ class Profile {
     public string $username;
     public string $pw_hash;
     public DateTime $creation_dt;
+    public bool $displayable;
 
     public static function fetchByUsername(string $username): Profile|null {
         $username = str_replace(" ", "", trim($username));
@@ -18,7 +19,8 @@ class Profile {
             SELECT
                 username,
                 pw_hash,
-                creation_dt
+                creation_dt,
+                displayable
             FROM
                 api_nsi_profiles
             WHERE username = ?;
@@ -32,6 +34,7 @@ class Profile {
             $profile->username = $responses[0]->username;
             $profile->pw_hash = $responses[0]->pw_hash;
             $profile->creation_dt = new DateTime($responses[0]->creation_dt);
+            $profile->displayable = $responses[0]->displayable != 0;
             return $profile;
         }
     }
@@ -46,8 +49,9 @@ class Profile {
                 first_name,
                 last_name,
                 class,
-                creation_dt
-            ) VALUES (?, ?, ?, ?, ?, TIMESTAMP(?, ?));
+                creation_dt,
+                displayable
+            ) VALUES (?, ?, ?, ?, ?, TIMESTAMP(?, ?), 1);
             EOF
         )->execute([$username, $pw_hash, $first_name, $last_name, $class, (new DateTime())->format("Y-m-d"), (new DateTime())->format("H:i:s")]);
     }
