@@ -47,10 +47,10 @@ class Score {
                         dt,
                         stars_count
                     FROM
-                        sandbox.api_nsi_stars
+                        api_nsi_stars
                             JOIN
                         sandbox.api_nsi_challenges
-                            ON sandbox.api_nsi_stars.challenge_id = sandbox.api_nsi_challenges.id
+                            ON api_nsi_stars.challenge_id = api_nsi_challenges.id
                     ) AS all_stars_by_username
                 GROUP BY
                     username
@@ -58,7 +58,7 @@ class Score {
                     total_stars
                 ) stars_of_username
                     NATURAL JOIN
-                sandbox.api_nsi_profiles
+                api_nsi_profiles
             WHERE
                 displayable = 1
             LIMIT ?;
