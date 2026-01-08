@@ -17,6 +17,7 @@ CREATE TABLE IF NOT EXISTS sandbox.api_nsi_profiles (
 	last_name varchar(255) NOT NULL,
 	class varchar(255) NOT NULL,
 	creation_dt datetime NOT NULL,
+	displayable tinyint(1) NOT NULL
 	CONSTRAINT `PRIMARY` PRIMARY KEY (username)
 );
 
