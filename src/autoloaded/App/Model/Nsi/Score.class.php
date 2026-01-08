@@ -83,10 +83,10 @@ class Score {
                 diamond_deadline_dt,
                 gold_deadline_dt
             FROM
-                sandbox.api_nsi_stars
+                api_nsi_stars
                     JOIN
-                sandbox.api_nsi_challenges
-                    ON sandbox.api_nsi_stars.challenge_id = sandbox.api_nsi_challenges.id
+                api_nsi_challenges
+                    ON api_nsi_stars.challenge_id = api_nsi_challenges.id
             WHERE username IN ($marker_str);
             EOF
         )->execute(array_keys($best_scores));
