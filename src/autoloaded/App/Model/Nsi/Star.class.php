@@ -9,7 +9,7 @@ class Star {
     public string $challenge_id;
     public string $challenge_title;
     public DateTime $dt;
-    public string $type;
+    public string $specialty;
     public int $amount;
 
     public static function has_been_obtained(string $username, string $challenge_id): bool {

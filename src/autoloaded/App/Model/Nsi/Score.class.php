@@ -15,15 +15,15 @@ class Score {
     }
 
     public function getTotalBasicStars(): int {
-        return array_sum(array_map(function(Star $star) { return $star->type == "BASIC" ? $star->amount : 0; }, $this->stars));
+        return array_sum(array_map(function(Star $star) { return $star->specialty == "BASIC" ? $star->amount : 0; }, $this->stars));
     }
 
     public function getTotalDiamondStars(): int {
-        return array_sum(array_map(function(Star $star) { return $star->type == "DIAMOND" ? $star->amount : 0; }, $this->stars));
+        return array_sum(array_map(function(Star $star) { return $star->specialty == "DIAMOND" ? $star->amount : 0; }, $this->stars));
     }
 
     public function getTotalGoldStars(): int {
-        return array_sum(array_map(function(Star $star) { return $star->type == "GOLD" ? $star->amount : 0; }, $this->stars));
+        return array_sum(array_map(function(Star $star) { return $star->specialty == "GOLD" ? $star->amount : 0; }, $this->stars));
     }
 
     public function getTotalSpecialStars(): int {
@@ -97,11 +97,11 @@ class Score {
             $star->challenge_title = $response->title;
             $star->dt = new DateTime($response->dt);
             if ($star->dt < new DateTime($response->diamond_deadline_dt))
-                $star->type = "DIAMOND";
+                $star->specialty = "DIAMOND";
             elseif ($star->dt < new DateTime($response->gold_deadline_dt))
-                $star->type = "GOLD";
+                $star->specialty = "GOLD";
             else
-                $star->type = "BASIC";
+                $star->specialty = "BASIC";
             $star->amount = $response->stars_count;
             array_push($best_scores[$response->username]->stars, $star);
         }
