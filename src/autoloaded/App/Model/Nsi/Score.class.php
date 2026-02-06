@@ -62,7 +62,7 @@ class Score {
 
         $best_scores = array();
         foreach ($responses as $response) {
-            $best_scores[$response->username] = new Score;
+            $best_scores[$response->username] = new Score();
             $best_scores[$response->username]->username = $response->username;
         }
 
@@ -76,7 +76,27 @@ class Score {
                     dt,
                     stars_count,
                     title,
-                    IF((challenge_id, dt) IN (SELECT challenge_id, MIN(dt) FROM api_nsi_stars GROUP BY challenge_id), "DIAMOND", IF(CURRENT_TIMESTAMP() < gold_deadline_dt, "GOLD", "BASIC")) AS specialty
+                    IF(
+                        (challenge_id, dt) IN (
+                            SELECT
+                                challenge_id, MIN(dt)
+                            FROM
+                                api_nsi_stars
+                            JOIN
+                                api_nsi_profiles
+                            ON
+                                api_nsi_stars.username = api_nsi_profiles.username
+                            WHERE
+                                displayable = 1
+                            GROUP BY challenge_id
+                        ),
+                        "DIAMOND",
+                        IF(
+                            CURRENT_TIMESTAMP() < gold_deadline_dt,
+                            "GOLD",
+                            "BASIC"
+                        )
+                    ) AS specialty
                 FROM
                     api_nsi_stars
                         JOIN
