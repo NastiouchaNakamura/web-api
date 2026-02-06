@@ -80,14 +80,23 @@ class Score {
                 dt,
                 stars_count,
                 title,
-                diamond_deadline_dt,
-                gold_deadline_dt
+                IF(
+                    (challenge_id, dt) IN (SELECT challenge_id, MIN(dt) FROM api_nsi_stars GROUP BY challenge_id),
+                    "DIAMOND",
+                    IF(
+                        CURRENT_TIMESTAMP() < gold_deadline_dt,
+                        "GOLD",
+                        "BASIC"
+                    )
+                ) AS specialty
             FROM
                 api_nsi_stars
                     JOIN
                 api_nsi_challenges
                     ON api_nsi_stars.challenge_id = api_nsi_challenges.id
-            WHERE username IN ($marker_str);
+            WHERE
+                username IN ($marker_str)
+            ORDER BY challenge_id;
             EOF
         )->execute(array_keys($best_scores));
 
@@ -96,12 +105,7 @@ class Score {
             $star->challenge_id = $response->challenge_id;
             $star->challenge_title = $response->title;
             $star->dt = new DateTime($response->dt);
-            if ($star->dt < new DateTime($response->diamond_deadline_dt))
-                $star->specialty = "DIAMOND";
-            elseif ($star->dt < new DateTime($response->gold_deadline_dt))
-                $star->specialty = "GOLD";
-            else
-                $star->specialty = "BASIC";
+            $star->specialty = $response->specialty;
             $star->amount = $response->stars_count;
             array_push($best_scores[$response->username]->stars, $star);
         }
