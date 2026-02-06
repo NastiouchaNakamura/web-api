@@ -8,7 +8,6 @@ use App\Request\SqlRequest;
 class Score {
     public string $username;
     public array $stars = array();
-    public array $special_stars = array();
 
     public function getTotalStars(): int {
         return array_sum(array_map(function(Star $star) { return $star->amount; }, $this->stars));
@@ -24,10 +23,6 @@ class Score {
 
     public function getTotalGoldStars(): int {
         return array_sum(array_map(function(Star $star) { return $star->specialty == "GOLD" ? $star->amount : 0; }, $this->stars));
-    }
-
-    public function getTotalSpecialStars(): int {
-        return array_sum(array_map(function(Star $star) { return $star->amount; }, $this->special_stars));
     }
 
     public static function fetch_best_scores(int $limit): array {
@@ -74,20 +69,36 @@ class Score {
         // Récupération des étoiles des profils.
         $marker_str = implode(", ", array_fill(0, count($best_scores), '?'));
         $responses = SqlRequest::new(<<< EOF
-            SELECT
-                username,
-                challenge_id,
-                dt,
-                stars_count,
-                title,
-                diamond_deadline_dt,
-                gold_deadline_dt
-            FROM
-                api_nsi_stars
-                    JOIN
-                api_nsi_challenges
-                    ON api_nsi_stars.challenge_id = api_nsi_challenges.id
-            WHERE username IN ($marker_str);
+            (
+                SELECT
+                    username,
+                    challenge_id,
+                    dt,
+                    stars_count,
+                    title,
+                    IF((challenge_id, dt) IN (SELECT challenge_id, MIN(dt) FROM api_nsi_stars GROUP BY challenge_id), "DIAMOND", IF(CURRENT_TIMESTAMP() < gold_deadline_dt, "GOLD", "BASIC")) AS specialty
+                FROM
+                    api_nsi_stars
+                        JOIN
+                    api_nsi_challenges
+                        ON api_nsi_stars.challenge_id = api_nsi_challenges.id
+                WHERE username IN ($marker_str)
+            )
+                UNION
+            (
+                SELECT
+                    username,
+                    event_id AS challenge_id,
+                    end_dt AS dt,
+                    stars_count,
+                    title,
+                    "SPECIAL"
+                FROM
+                    api_nsi_special_stars
+                        JOIN
+                    api_nsi_events
+                        ON api_nsi_special_stars.event_id = api_nsi_events.id
+            );
             EOF
         )->execute(array_keys($best_scores));
 
@@ -96,12 +107,7 @@ class Score {
             $star->challenge_id = $response->challenge_id;
             $star->challenge_title = $response->title;
             $star->dt = new DateTime($response->dt);
-            if ($star->dt < new DateTime($response->diamond_deadline_dt))
-                $star->specialty = "DIAMOND";
-            elseif ($star->dt < new DateTime($response->gold_deadline_dt))
-                $star->specialty = "GOLD";
-            else
-                $star->specialty = "BASIC";
+            $star->specialty = $response->specialty;
             $star->amount = $response->stars_count;
             array_push($best_scores[$response->username]->stars, $star);
         }

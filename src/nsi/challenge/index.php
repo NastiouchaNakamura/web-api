@@ -56,6 +56,7 @@ try {
 
             // Est-ce que ces identifiants sont corrects ?
             [$username, $password] = explode(":", $credentials);
+            $username = strtolower($username);
             $profile = Profile::fetchByUsername($username);
             if (!password_verify($password, $profile->pw_hash)) {
                 header("WWW-Authenticate: Basic realm=\"$realm\", charset=\"UTF-8\"");
