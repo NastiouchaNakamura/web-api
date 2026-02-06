@@ -56,6 +56,6 @@ CREATE TABLE IF NOT EXISTS sandbox.api_nsi_special_stars (
 	event_id varchar(63) NOT NULL,
 	stars_count TINYINT UNSIGNED NOT NULL,
 	CONSTRAINT `PRIMARY` PRIMARY KEY (username,event_id),
-	CONSTRAINT api_nsi_special_stars_api_nsi_profiles_FK FOREIGN KEY (username) REFERENCES sandbox.api_nsi_profiles(username) ON DELETE CASCADE ON UPDATE CASCADE
-	CONSTRAINT api_nsi_special_stars_api_nsi_events_FK FOREIGN KEY (event_id) REFERENCES sandbox.api_nsi_events(id) ON DELETE CASCADE ON UPDATE CASCADE;
-)
+	CONSTRAINT api_nsi_special_stars_api_nsi_profiles_FK FOREIGN KEY (username) REFERENCES sandbox.api_nsi_profiles(username) ON DELETE CASCADE ON UPDATE CASCADE,
+	CONSTRAINT api_nsi_special_stars_api_nsi_events_FK FOREIGN KEY (event_id) REFERENCES sandbox.api_nsi_events(id) ON DELETE CASCADE ON UPDATE CASCADE
+);
