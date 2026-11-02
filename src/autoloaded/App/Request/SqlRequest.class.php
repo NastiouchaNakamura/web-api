@@ -3,6 +3,7 @@ namespace App\Request;
 
 use PDO;
 use PDOException;
+use RuntimeException;
 
 /**
  * Class used to send SQL requests to SQL server and return response as PHP
@@ -24,10 +25,11 @@ class SqlRequest {
      * Create new SqlRequest instance
      * 
      * Environment variables "SQL_HOST", "SQL_PORT", "SQL_DATABASE", "SQL_USER"
-     * and "SQL_PASSWORD" have to be set before call
+     * and "SQL_PASSWORD" must be set before call
      * 
      * @param string $sqlScript SQL script to be executed
      * @return SqlRequest the SqlRequest instance ready for use
+     * @throws RuntimeException when a required environment variable is not set
      * @throws PDOException when an exception occurs on initial connection
      */
     public static function new(string $sqlScript): SqlRequest {
@@ -38,6 +40,12 @@ class SqlRequest {
      * See SqlRequest::new for documentation
      */
     private function __construct(string $sqlScript) {
+        foreach (["SQL_HOST", "SQL_PORT", "SQL_DATABASE", "SQL_USER", "SQL_PASSWORD"] as $env) {
+            if (!getenv($env)) {
+                throw new RuntimeException("$env environment variable is not set");
+            }
+        }
+
         $this->pdo = new PDO(
             "mysql:host=" . getenv("SQL_HOST")
             . ';port=' . getenv("SQL_PORT")
