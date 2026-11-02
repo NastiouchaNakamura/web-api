@@ -20,7 +20,8 @@ try {
             RestResponse::set(400, UserError::new("Missing URI parameter 'flag': answer flag as string 'flag' must be provided"));
 
         // Récupération du challenge
-        $challenge = Challenge::fetch($_GET["id"]);
+        $id = $_GET["id"];
+        $challenge = Challenge::fetch($id);
 
         // Le challenge existe-t-il ?
         if (is_null($challenge))
